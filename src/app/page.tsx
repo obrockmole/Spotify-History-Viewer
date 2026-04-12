@@ -1,11 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Listen } from "@/types";
 
 export default function Home() {
-  const [entryCount, setEntryCount] = useState<number | null>(null);
   const [fileNames, setFileNames] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const router = useRouter();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -14,12 +17,12 @@ export default function Home() {
     }
 
     setFileNames(Array.from(files).map(f => f.name));
-    setEntryCount(null);
     setError(null);
+    setIsProcessing(true);
 
-    let totalEntries = 0;
+    let allEntries: Listen[] = [];
     const filePromises = Array.from(files).map(file => {
-      return new Promise<number>((resolve, reject) => {
+      return new Promise<Listen[]>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
           try {
@@ -27,7 +30,7 @@ export default function Home() {
             if (typeof content === "string") {
               const data = JSON.parse(content);
               if (Array.isArray(data)) {
-                resolve(data.length);
+                resolve(data);
               } else {
                 reject("Invalid JSON format.");
               }
@@ -37,6 +40,7 @@ export default function Home() {
             reject(`Error parsing ${file.name}.`);
           }
         };
+
         reader.onerror = () => {
           reject(`Error reading ${file.name}.`);
         };
@@ -45,12 +49,14 @@ export default function Home() {
     });
 
     Promise.all(filePromises)
-      .then(entryCounts => {
-        totalEntries = entryCounts.reduce((acc, count) => acc + count, 0);
-        setEntryCount(totalEntries);
+      .then(results => {
+        allEntries = results.flat();
+        sessionStorage.setItem("spotifyHistory", JSON.stringify(allEntries));
+        setIsProcessing(false);
       })
       .catch(err => {
         setError(err);
+        setIsProcessing(false);
       });
   };
 
@@ -79,17 +85,23 @@ export default function Home() {
           />
         </div>
 
-        {fileNames.length > 0 && (
+        {isProcessing && (
+            <div className="mt-8 text-lg">
+                <p>Processing files...</p>
+            </div>
+        )}
+
+        {fileNames.length > 0 && !isProcessing && (
           <div className="mt-8 text-lg">
             <p>
               Files: <span className="font-medium">{fileNames.join(", ")}</span>
             </p>
-          </div>
-        )}
-
-        {entryCount !== null && (
-          <div className="mt-4 text-2xl font-semibold text-green-600 dark:text-green-400">
-            <p>Number of entries: {entryCount.toLocaleString()}</p>
+            <button
+                onClick={() => router.push('/history')}
+                className="mt-4 cursor-pointer inline-flex items-center justify-center rounded-full bg-green-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-green-700"
+            >
+                View History
+            </button>
           </div>
         )}
 
