@@ -3,12 +3,14 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Listen } from "@/types";
+import { useHistory } from "@/context/HistoryContext";
 
 export default function Home() {
   const [fileNames, setFileNames] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();
+  const { setHistory } = useHistory();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -32,17 +34,18 @@ export default function Home() {
               if (Array.isArray(data)) {
                 resolve(data);
               } else {
-                reject("Invalid JSON format.");
+                reject(new Error("Invalid JSON format."));
               }
             }
+
           } catch (err) {
             console.error(err);
-            reject(`Error parsing ${file.name}.`);
+            reject(new Error(`Error parsing ${file.name}.`));
           }
         };
 
         reader.onerror = () => {
-          reject(`Error reading ${file.name}.`);
+          reject(new Error(`Error reading ${file.name}.`));
         };
         reader.readAsText(file);
       });
@@ -51,11 +54,16 @@ export default function Home() {
     Promise.all(filePromises)
       .then(results => {
         allEntries = results.flat();
-        sessionStorage.setItem("spotifyHistory", JSON.stringify(allEntries));
+        setHistory(allEntries);
         setIsProcessing(false);
       })
+
       .catch(err => {
-        setError(err);
+        if (err instanceof Error) {
+            setError(err.message);
+        } else {
+            setError(String(err));
+        }
         setIsProcessing(false);
       });
   };
@@ -74,6 +82,7 @@ export default function Home() {
           >
             Select JSON File
           </label>
+
           <input
             id="file-upload"
             name="file-upload"
@@ -96,6 +105,7 @@ export default function Home() {
             <p>
               Files: <span className="font-medium">{fileNames.join(", ")}</span>
             </p>
+
             <button
                 onClick={() => router.push('/history')}
                 className="mt-4 cursor-pointer inline-flex items-center justify-center rounded-full bg-green-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-green-700"
