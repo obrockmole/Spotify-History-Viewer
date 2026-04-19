@@ -96,7 +96,7 @@ export default function Home() {
 
         {isProcessing && (
             <div className="mt-8 text-lg">
-                <p>Processing files...</p>
+                <p>Loading...</p>
             </div>
         )}
 
