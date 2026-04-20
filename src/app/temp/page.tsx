@@ -1,50 +1,112 @@
+import styles from './temp.module.css';
+
 export default function TempPage() {
     return (
-        <div className="flex flex-col h-screen p-4 gap-4 bg-[#1C232B] text-white">
-            <div className="w-full rounded-md shadow-md bg-[#22292F]">
-                <div className="p-2">
+        <div className={styles.container}>
+            <div className={styles.card}>
+                <div className={styles.cardHeader}>
                     <h2 className="text">Timeline</h2>
                 </div>
             </div>
 
-            <div className="flex justify-center gap-2">
+            <div className={styles.navButtons}>
                 {["Overview", "Skips", "Timeline", "Artists"].map(label => (
-                    <button key={label} className="px-4 py-2 rounded-full text-sm font-medium border border-gray-600 text-gray-300 hover:bg-gray-700">
+                    <button key={label} className={styles.button}>
                         {label}
                     </button>
                 ))}
             </div>
 
-            <div className="flex flex-1 gap-4 min-h-0">
-                <div className="flex flex-col w-2/3 gap-4">
-                    <div className="flex-1 rounded-md shadow-md bg-[#22292F]">
-                        <div className="p-4">
-                            <h2 className="text-center">Listens over time</h2>
+            <div className={styles.mainContent}>
+                <div className={styles.leftColumn}>
+                    <div className={`${styles.card} ${styles.topRow}`}>
+                        <div className={styles.cardBody}>
+                            <h2 className={styles.cardTitle}>Listens Over Time</h2>
                         </div>
-                        <div className="h-1 bg-[#282F35]"></div>
+                        <div className={styles.cardDivider}></div>
                     </div>
 
-                    <div className="flex flex-1 gap-4">
-                        <div className="flex-1 rounded-md shadow-md bg-[#22292F]">
-                            <div className="p-4">
-                                <h2 className="text-center">Activity by day/week</h2>
+                    <div className={styles.bottomRow}>
+                        <div className={`${styles.card} ${styles.bottomLeftCard}`}>
+                            <div className={styles.cardBody}>
+                                <h2 className={styles.cardTitle}>Activity by Day/Week</h2>
                             </div>
-                            <div className="h-1 bg-[#282F35]"></div>
+                            <div className={styles.cardDivider}></div>
                         </div>
-                        <div className="flex-1 rounded-md shadow-md bg-[#22292F]">
-                            <div className="p-4">
-                                <h2 className="text-center">Listens by device</h2>
+                        <div className={`${styles.card} ${styles.bottomRightCard}`}>
+                            <div className={styles.cardBody}>
+                                <h2 className={styles.cardTitle}>Listens by Device</h2>
                             </div>
-                            <div className="h-1 bg-[#282F35]"></div>
+                            <div className={styles.cardDivider}></div>
                         </div>
                     </div>
                 </div>
 
-                <div className="w-1/3 rounded-md shadow-md bg-[#22292F]">
-                    <div className="p-4">
-                        <h2 className="text-center">Listening Stats</h2>
+                <div className={`${styles.card} ${styles.rightColumn}`}>
+                    <div className={styles.cardBody}>
+                        <h2 className={styles.cardTitle}>Listening Stats</h2>
                     </div>
-                    <div className="h-1 bg-[#282F35]"></div>
+                    <div className={styles.cardDivider}></div>
+                    <div className={styles.cardBody}>
+                        <div className={styles.statsContainer}>
+                            <div className={styles.statsItem}>
+                                <span className={styles.statsLabel}>Total Listens</span>
+                                <span className={styles.statsValue}>0</span>
+                            </div>
+                            <div className={styles.statsSubItem}>
+                                <span className={styles.statsLabel}>Unique songs</span>
+                                <span className={styles.statsValue}>0</span>
+                            </div>
+                            <div className={styles.statsSubItem}>
+                                <span className={styles.statsLabel}>Skipped</span>
+                                <span className={styles.statsValue}>0</span>
+                            </div>
+
+                            <div className={styles.statsItem}>
+                                <span className={styles.statsLabel}>Total Artists</span>
+                                <span className={styles.statsValue}>0</span>
+                            </div>
+                            <div className={styles.statsSubItem}>
+                                <span className={styles.statsLabel}>Unique artists</span>
+                                <span className={styles.statsValue}>0</span>
+                            </div>
+
+                            <div className={styles.statsItem}>
+                                <span className={styles.statsLabel}>Minutes</span>
+                                <span className={styles.statsValue}>0</span>
+                            </div>
+
+                            <div className={styles.statsItem}>
+                                <span className={styles.statsLabel}>Avg Listens per Day</span>
+                                <span className={styles.statsValue}>0</span>
+                            </div>
+
+                            <div className={styles.statsItem}>
+                                <span className={styles.statsLabel}>Longest time without listens</span>
+                                <span className={styles.statsValue}>0</span>
+                            </div>
+
+                            <div>
+                                <h3 className={styles.statsLabel}>Most Active...</h3>
+                                <div className={styles.statsSubItem}>
+                                    <span className={styles.statsLabel}>Year</span>
+                                    <span className={styles.statsValue}>0</span>
+                                </div>
+                                <div className={styles.statsSubItem}>
+                                    <span className={styles.statsLabel}>Month</span>
+                                    <span className={styles.statsValue}>0</span>
+                                </div>
+                                <div className={styles.statsSubItem}>
+                                    <span className={styles.statsLabel}>Day</span>
+                                    <span className={styles.statsValue}>0</span>
+                                </div>
+                                <div className={styles.statsSubItem}>
+                                    <span className={styles.statsLabel}>Hour</span>
+                                    <span className={styles.statsValue}>0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

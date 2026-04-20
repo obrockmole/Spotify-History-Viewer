@@ -1,0 +1,114 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 1rem;
+    gap: 1rem;
+    background-color: #121212;
+    color: white;
+}
+
+.card {
+    background-color: #1F1F1F;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.cardHeader {
+    padding: 0.5rem;
+}
+
+.cardTitle {
+    text-align: center;
+}
+
+.cardDivider {
+    height: 4px;
+    background-color: #282828;
+}
+
+.cardBody {
+    padding: 1rem;
+}
+
+.navButtons {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.button {
+    padding: 0.5rem 1rem;
+    border-radius: 80px;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    background-color: #1F1F1F;
+    border: 1px solid #414446;
+    color: #D1D5DB;
+}
+
+.button:hover {
+    background-color: #222222;
+}
+
+.mainContent {
+    display: flex;
+    flex: 1 1 0;
+    gap: 1rem;
+    min-height: 0;
+}
+
+.leftColumn {
+    display: flex;
+    flex-direction: column;
+    width: 66.67%;
+    gap: 1rem;
+}
+
+.rightColumn {
+    width: 33.33%;
+}
+
+.topRow {
+    flex: 1 1 0;
+}
+
+.bottomRow {
+    display: flex;
+    flex: 1 1 0;
+    gap: 1rem;
+}
+
+.bottomLeftCard {
+    flex: 1 1 0;
+}
+
+.bottomRightCard {
+    flex: 1 1 0;
+}
+
+.statsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.statsItem {
+    display: flex;
+    justify-content: space-between;
+}
+
+.statsLabel {
+    color: #A0A0A0;
+}
+
+.statsValue {
+    font-weight: bold;
+}
+
+.statsSubItem {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 2rem;
+}
