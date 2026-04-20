@@ -3,13 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useHistory } from "@/context/HistoryContext";
+import styles from './history.module.css';
 
 export default function HistoryPage() {
   const router = useRouter();
   const { history } = useHistory();
-  const [selectedYear, setSelectedYear] = useState<string>("Total");
-
-  const years = Array.from(new Set(history.map(item => new Date(item.ts).getFullYear().toString()))).sort();
 
   const [stats, setStats] = useState({
     listens: 0,
@@ -23,71 +21,124 @@ export default function HistoryPage() {
       return;
     }
 
-    const filteredListens = selectedYear === "Total"
-      ? history
-      : history.filter(item => new Date(item.ts).getFullYear().toString() === selectedYear);
-
-    const artists = new Set(filteredListens.map(item => item.master_metadata_album_artist_name));
-    const totalMs = filteredListens.reduce((acc, item) => acc + item.ms_played, 0);
+    const artists = new Set(history.map(item => item.master_metadata_album_artist_name));
+    const totalMs = history.reduce((acc, item) => acc + item.ms_played, 0);
     const minutesListened = Math.round(totalMs / 60000);
 
     setStats({
-      listens: filteredListens.length,
+      listens: history.length,
       uniqueArtists: artists.size,
       minutesListened,
     });
-
-  }, [history, selectedYear, router]);
+  }, [history, router]);
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center min-h-screen bg-zinc-50 font-sans dark:bg-black text-zinc-900 dark:text-zinc-50">
-      <main className="flex flex-col items-center justify-center flex-1 w-full max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-        {years.length > 1 && (
-          <div className="mb-8">
-            <nav className="flex space-x-4">
-              <button
-                onClick={() => setSelectedYear("Total")}
-                className={`px-4 py-2 rounded-md text-sm font-medium ${selectedYear === "Total" ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700"}`}
-              >
-                Total
-              </button>
-
-              {years.map(year => (
-                <button
-                  key={year}
-                  onClick={() => setSelectedYear(year)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium ${selectedYear === year ? "bg-blue-600 text-white" : "text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700"}`}
-                >
-                  {year}
-                </button>
-              ))}
-            </nav>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-4xl">
-            <div className="p-6 rounded-lg shadow-md bg-zinc-100 dark:bg-zinc-800">
-                <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Total Listens</h2>
-                <p className="mt-2 text-4xl font-bold text-blue-600 dark:text-blue-400">
-                    {stats.listens.toLocaleString()}
-                </p>
-            </div>
-
-            <div className="p-6 rounded-lg shadow-md bg-zinc-100 dark:bg-zinc-800">
-                <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Artists</h2>
-                <p className="mt-2 text-4xl font-bold text-green-600 dark:text-green-400">
-                    {stats.uniqueArtists.toLocaleString()}
-                </p>
-            </div>
-
-            <div className="p-6 rounded-lg shadow-md bg-zinc-100 dark:bg-zinc-800">
-                <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Minutes Listened</h2>
-                <p className="mt-2 text-4xl font-bold text-purple-600 dark:text-purple-400">
-                    {stats.minutesListened.toLocaleString()}
-                </p>
-            </div>
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <div className={styles.cardHeader}>
+          <h2 className="text">Timeline</h2>
         </div>
-      </main>
+      </div>
+
+      <div className={styles.navButtons}>
+        {["Overview", "Skips", "Timeline", "Artists"].map(label => (
+          <button key={label} className={styles.button}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className={styles.mainContent}>
+        <div className={styles.leftColumn}>
+          <div className={`${styles.card} ${styles.topRow}`}>
+            <div className={styles.cardBody}>
+              <h2 className={styles.cardTitle}>Listens Over Time</h2>
+            </div>
+            <div className={styles.cardDivider}></div>
+          </div>
+
+          <div className={styles.bottomRow}>
+            <div className={`${styles.card} ${styles.bottomLeftCard}`}>
+              <div className={styles.cardBody}>
+                <h2 className={styles.cardTitle}>Activity by Day/Week</h2>
+              </div>
+              <div className={styles.cardDivider}></div>
+            </div>
+
+            <div className={`${styles.card} ${styles.bottomRightCard}`}>
+              <div className={styles.cardBody}>
+                <h2 className={styles.cardTitle}>Listens by Device</h2>
+              </div>
+              <div className={styles.cardDivider}></div>
+            </div>
+          </div>
+        </div>
+
+        <div className={`${styles.card} ${styles.rightColumn}`}>
+          <div className={styles.cardBody}>
+            <h2 className={styles.cardTitle}>Listening Stats</h2>
+          </div>
+
+          <div className={styles.cardDivider}></div>
+
+          <div className={styles.cardBody}>
+            <div className={styles.statsContainer}>
+              <div className={styles.statsItem}>
+                <span className={styles.statsLabel}>Total Listens</span>
+                <span className={styles.statsValue}>{stats.listens}</span>
+              </div>
+              <div className={styles.statsSubItem}>
+                <span className={styles.statsLabel}>Unique songs</span>
+                <span className={styles.statsValue}>0</span>
+              </div>
+              <div className={styles.statsSubItem}>
+                <span className={styles.statsLabel}>Skipped</span>
+                <span className={styles.statsValue}>0</span>
+              </div>
+
+              <div className={styles.statsItem}>
+                <span className={styles.statsLabel}>Total Artists</span>
+                <span className={styles.statsValue}>{stats.uniqueArtists}</span>
+              </div>
+
+              <div className={styles.statsItem}>
+                <span className={styles.statsLabel}>Minutes</span>
+                <span className={styles.statsValue}>{stats.minutesListened}</span>
+              </div>
+
+              <div className={styles.statsItem}>
+                <span className={styles.statsLabel}>Avg Listens per Day</span>
+                <span className={styles.statsValue}>0</span>
+              </div>
+
+              <div className={styles.statsItem}>
+                <span className={styles.statsLabel}>Longest time without listens</span>
+                <span className={styles.statsValue}>0</span>
+              </div>
+
+              <div>
+                <h3 className={styles.statsLabel}>Most Active...</h3>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Year</span>
+                  <span className={styles.statsValue}>0</span>
+                </div>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Month</span>
+                  <span className={styles.statsValue}>0</span>
+                </div>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Day</span>
+                  <span className={styles.statsValue}>0</span>
+                </div>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Hour</span>
+                  <span className={styles.statsValue}>0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  );
+  )
 }
