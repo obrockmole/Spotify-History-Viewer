@@ -11,6 +11,8 @@ export default function HistoryPage() {
 
   const [stats, setStats] = useState({
     listens: 0,
+    uniqueSongs: 0,
+    skippedSongs: 0,
     uniqueArtists: 0,
     minutesListened: 0,
   });
@@ -24,9 +26,13 @@ export default function HistoryPage() {
     const artists = new Set(history.map(item => item.master_metadata_album_artist_name));
     const totalMs = history.reduce((acc, item) => acc + item.ms_played, 0);
     const minutesListened = Math.round(totalMs / 60000);
+    const uniqueSongs = new Set(history.map(item => item.master_metadata_track_name));
+    const skippedSongs = history.filter(item => item.skipped).length;
 
     setStats({
       listens: history.length,
+      uniqueSongs: uniqueSongs.size,
+      skippedSongs,
       uniqueArtists: artists.size,
       minutesListened,
     });
@@ -41,7 +47,7 @@ export default function HistoryPage() {
       </div>
 
       <div className={styles.navButtons}>
-        {["Overview", "Skips", "Timeline", "Artists"].map(label => (
+        {["Overview", "Artists", "Skips", "Timeline"].map(label => (
           <button key={label} className={styles.button}>
             {label}
           </button>
@@ -55,6 +61,9 @@ export default function HistoryPage() {
               <h2 className={styles.cardTitle}>Listens Over Time</h2>
             </div>
             <div className={styles.cardDivider}></div>
+            <div className={styles.cardBody}>
+                <p className="text-2xl" style={{textAlign: "center"}}>🚧 Work in Progress 🚧</p>
+            </div>
           </div>
 
           <div className={styles.bottomRow}>
@@ -63,6 +72,9 @@ export default function HistoryPage() {
                 <h2 className={styles.cardTitle}>Activity by Day/Week</h2>
               </div>
               <div className={styles.cardDivider}></div>
+              <div className={styles.cardBody}>
+                  <p className="text-2xl" style={{textAlign: "center"}}>🚧 Work in Progress 🚧</p>
+              </div>
             </div>
 
             <div className={`${styles.card} ${styles.bottomRightCard}`}>
@@ -70,6 +82,9 @@ export default function HistoryPage() {
                 <h2 className={styles.cardTitle}>Listens by Device</h2>
               </div>
               <div className={styles.cardDivider}></div>
+              <div className={styles.cardBody}>
+                  <p className="text-2xl" style={{textAlign: "center"}}>🚧 Work in Progress 🚧</p>
+              </div>
             </div>
           </div>
         </div>
@@ -89,11 +104,11 @@ export default function HistoryPage() {
               </div>
               <div className={styles.statsSubItem}>
                 <span className={styles.statsLabel}>Unique songs</span>
-                <span className={styles.statsValue}>0</span>
+                <span className={styles.statsValue}>{stats.uniqueSongs}</span>
               </div>
               <div className={styles.statsSubItem}>
                 <span className={styles.statsLabel}>Skipped</span>
-                <span className={styles.statsValue}>0</span>
+                <span className={styles.statsValue}>{stats.skippedSongs}</span>
               </div>
 
               <div className={styles.statsItem}>
@@ -101,9 +116,20 @@ export default function HistoryPage() {
                 <span className={styles.statsValue}>{stats.uniqueArtists}</span>
               </div>
 
-              <div className={styles.statsItem}>
-                <span className={styles.statsLabel}>Minutes</span>
-                <span className={styles.statsValue}>{stats.minutesListened}</span>
+              <div>
+                <h3 className={styles.statsLabel}>Time spent listening</h3>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Minutes</span>
+                  <span className={styles.statsValue}>{stats.minutesListened}</span>
+                </div>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Hours</span>
+                  <span className={styles.statsValue}>{(stats.minutesListened / 60).toFixed(1)}</span>
+                </div>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Days</span>
+                  <span className={styles.statsValue}>{(stats.minutesListened / 1440).toFixed(1)}</span>
+                </div>
               </div>
 
               <div className={styles.statsItem}>
