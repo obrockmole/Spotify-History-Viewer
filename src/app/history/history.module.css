@@ -112,3 +112,13 @@
   justify-content: space-between;
   margin-left: 2rem;
 }
+
+.timelineCardBody {
+    padding: 0;
+}
+
+.title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 2.5rem;
+}

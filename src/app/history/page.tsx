@@ -1,13 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import { useHistory } from "@/context/HistoryContext";
 import styles from './history.module.css';
+import Timeline from "@/components/Timeline";
+import { Listen } from "@/types";
 
 export default function HistoryPage() {
   const router = useRouter();
   const { history } = useHistory();
+  const [filteredHistory, setFilteredHistory] = useState<Listen[]>(history);
+  const [dateRange, setDateRange] = useState<{ start: number | null, end: number | null }>({ start: null, end: null });
 
   const [stats, setStats] = useState({
     listens: 0,
@@ -15,34 +19,63 @@ export default function HistoryPage() {
     skippedSongs: 0,
     uniqueArtists: 0,
     minutesListened: 0,
+    avgListensPerDay: 0,
   });
 
   useEffect(() => {
     if (history.length === 0) {
       router.push("/");
-      return;
+    }
+  }, [history, router]);
+
+  useEffect(() => {
+    setFilteredHistory(history);
+  }, [history]);
+
+  useEffect(() => {
+    const artists = new Set(filteredHistory.map(item => item.master_metadata_album_artist_name));
+    const totalMs = filteredHistory.reduce((acc, item) => acc + item.ms_played, 0);
+    const minutesListened = Math.round(totalMs / 60000);
+    const uniqueSongs = new Set(filteredHistory.map(item => item.master_metadata_track_name));
+    const skippedSongs = filteredHistory.filter(item => item.skipped).length;
+
+    let avgListensPerDay = 0;
+    if (dateRange.start && dateRange.end && dateRange.end > dateRange.start) {
+      const timeDiff = Math.abs(dateRange.end - dateRange.start);
+      const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+      if (daysDiff > 0) {
+        avgListensPerDay = filteredHistory.length / daysDiff;
+      }
     }
 
-    const artists = new Set(history.map(item => item.master_metadata_album_artist_name));
-    const totalMs = history.reduce((acc, item) => acc + item.ms_played, 0);
-    const minutesListened = Math.round(totalMs / 60000);
-    const uniqueSongs = new Set(history.map(item => item.master_metadata_track_name));
-    const skippedSongs = history.filter(item => item.skipped).length;
-
     setStats({
-      listens: history.length,
+      listens: filteredHistory.length,
       uniqueSongs: uniqueSongs.size,
       skippedSongs,
       uniqueArtists: artists.size,
       minutesListened,
+      avgListensPerDay,
     });
-  }, [history, router]);
+  }, [filteredHistory, dateRange]);
+
+  const handleRangeChange = useCallback((start: number, end: number) => {
+    setDateRange({ start, end });
+    const newFilteredHistory = history.filter(item => {
+      const itemDate = new Date(item.ts).getTime();
+      return itemDate >= start && itemDate <= end;
+    });
+    setFilteredHistory(newFilteredHistory);
+  }, [history]);
 
   return (
     <div className={styles.container}>
+      <h1 className={styles.title}>
+        Spotify History Viewer
+      </h1>
+
       <div className={styles.card}>
-        <div className={styles.cardHeader}>
-          <h2 className="text">Timeline</h2>
+        <div className={`${styles.cardBody} ${styles.timelineCardBody}`}>
+          <Timeline history={history} onRangeChange={handleRangeChange} />
         </div>
       </div>
 
@@ -134,31 +167,31 @@ export default function HistoryPage() {
 
               <div className={styles.statsItem}>
                 <span className={styles.statsLabel}>Avg Listens per Day</span>
-                <span className={styles.statsValue}>0</span>
+                <span className={styles.statsValue}>{stats.avgListensPerDay.toFixed(1)}</span>
               </div>
 
               <div className={styles.statsItem}>
                 <span className={styles.statsLabel}>Longest time without listens</span>
-                <span className={styles.statsValue}>0</span>
+                <span className={styles.statsValue}>-1</span>
               </div>
 
               <div>
                 <h3 className={styles.statsLabel}>Most Active...</h3>
                 <div className={styles.statsSubItem}>
                   <span className={styles.statsLabel}>Year</span>
-                  <span className={styles.statsValue}>0</span>
+                  <span className={styles.statsValue}>-1</span>
                 </div>
                 <div className={styles.statsSubItem}>
                   <span className={styles.statsLabel}>Month</span>
-                  <span className={styles.statsValue}>0</span>
+                  <span className={styles.statsValue}>-1</span>
                 </div>
                 <div className={styles.statsSubItem}>
                   <span className={styles.statsLabel}>Day</span>
-                  <span className={styles.statsValue}>0</span>
+                  <span className={styles.statsValue}>-1</span>
                 </div>
                 <div className={styles.statsSubItem}>
                   <span className={styles.statsLabel}>Hour</span>
-                  <span className={styles.statsValue}>0</span>
+                  <span className={styles.statsValue}>-1</span>
                 </div>
               </div>
             </div>
