@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import React, {useCallback, useEffect, useState} from "react";
 import { useHistory } from "@/context/HistoryContext";
-import styles from './history.module.css';
+import styles from "./history.module.css";
 import Timeline from "@/components/Timeline";
 import { Listen } from "@/types";
 
@@ -19,7 +19,7 @@ export default function HistoryPage() {
     skippedSongs: 0,
     uniqueArtists: 0,
     minutesListened: 0,
-    avgListensPerDay: 0,
+    days: 0
   });
 
   useEffect(() => {
@@ -39,13 +39,11 @@ export default function HistoryPage() {
     const uniqueSongs = new Set(filteredHistory.map(item => item.master_metadata_track_name));
     const skippedSongs = filteredHistory.filter(item => item.skipped).length;
 
-    let avgListensPerDay = 0;
+    let days = 1;
     if (dateRange.start && dateRange.end && dateRange.end > dateRange.start) {
       const timeDiff = Math.abs(dateRange.end - dateRange.start);
       const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-      if (daysDiff > 0) {
-        avgListensPerDay = filteredHistory.length / daysDiff;
-      }
+      days = daysDiff > 0 ? daysDiff : 1;
     }
 
     setStats({
@@ -54,7 +52,7 @@ export default function HistoryPage() {
       skippedSongs,
       uniqueArtists: artists.size,
       minutesListened,
-      avgListensPerDay,
+      days
     });
   }, [filteredHistory, dateRange]);
 
@@ -150,7 +148,7 @@ export default function HistoryPage() {
               </div>
 
               <div>
-                <h3 className={styles.statsLabel}>Time spent listening</h3>
+                <h3 className={styles.statsLabel}>Time Spent Listening</h3>
                 <div className={styles.statsSubItem}>
                   <span className={styles.statsLabel}>Minutes</span>
                   <span className={styles.statsValue}>{stats.minutesListened}</span>
@@ -165,14 +163,20 @@ export default function HistoryPage() {
                 </div>
               </div>
 
-              <div className={styles.statsItem}>
-                <span className={styles.statsLabel}>Avg Listens per Day</span>
-                <span className={styles.statsValue}>{stats.avgListensPerDay.toFixed(1)}</span>
-              </div>
-
-              <div className={styles.statsItem}>
-                <span className={styles.statsLabel}>Longest time without listens</span>
-                <span className={styles.statsValue}>-1</span>
+              <div>
+                <span className={styles.statsLabel}>Avg ______ per Day</span>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Listens</span>
+                  <span className={styles.statsValue}>{(stats.listens / stats.days).toFixed(1)}</span>
+                </div>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Artists</span>
+                  <span className={styles.statsValue}>{(stats.uniqueArtists / stats.days).toFixed(1)}</span>
+                </div>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Minutes listened</span>
+                  <span className={styles.statsValue}>{(stats.minutesListened / stats.days).toFixed(1)}</span>
+                </div>
               </div>
 
               <div>
@@ -186,11 +190,11 @@ export default function HistoryPage() {
                   <span className={styles.statsValue}>-1</span>
                 </div>
                 <div className={styles.statsSubItem}>
-                  <span className={styles.statsLabel}>Day</span>
+                  <span className={styles.statsLabel}>Week</span>
                   <span className={styles.statsValue}>-1</span>
                 </div>
                 <div className={styles.statsSubItem}>
-                  <span className={styles.statsLabel}>Hour</span>
+                  <span className={styles.statsLabel}>Day</span>
                   <span className={styles.statsValue}>-1</span>
                 </div>
               </div>
