@@ -104,13 +104,18 @@
 }
 
 .statsValue {
-  font-weight: bold;
+   font-weight: bold;
+   word-break: break-word;
+   overflow-wrap: break-word;
 }
 
 .statsSubItem {
-  display: flex;
-  justify-content: space-between;
-  margin-left: 2rem;
+   display: flex;
+   justify-content: space-between;
+   margin-left: 2rem;
+   gap: 1rem;
+   align-items: flex-start;
+   flex-wrap: wrap;
 }
 
 .timelineCardBody {

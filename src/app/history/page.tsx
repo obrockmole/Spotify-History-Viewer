@@ -19,7 +19,9 @@ export default function HistoryPage() {
     skippedSongs: 0,
     uniqueArtists: 0,
     minutesListened: 0,
-    days: 0
+    days: 0,
+    mostActiveYear: "",
+    mostActiveMonth: ""
   });
 
   useEffect(() => {
@@ -46,13 +48,38 @@ export default function HistoryPage() {
       days = daysDiff > 0 ? daysDiff : 1;
     }
 
+    const yearMap = new Map<number, number>();
+    const monthMap = new Map<string, number>();
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    filteredHistory.forEach(item => {
+      const date = new Date(item.ts);
+
+      const year = new Date(item.ts).getFullYear();
+      yearMap.set(year, (yearMap.get(year) || 0) + 1);
+
+      const monthKey = `${String(date.getMonth() + 1)}-${date.getFullYear()}`;
+      monthMap.set(monthKey, (monthMap.get(monthKey) || 0) + 1);
+    });
+    
+    const mostActiveYear = Array.from(yearMap.entries()).reduce((a, b) => b[1] > a[1] ? b : a)[0].toString();
+
+    const mostActiveMonth = (() => {
+          const monthKey = Array.from(monthMap.entries()).reduce((a, b) => b[1] > a[1] ? b : a)[0];
+          const [month, year] = monthKey.split('-');
+          const monthName = months[parseInt(month) - 1];
+          return `${monthName} ${year}`;
+        })();
+
     setStats({
       listens: filteredHistory.length,
       uniqueSongs: uniqueSongs.size,
       skippedSongs,
       uniqueArtists: artists.size,
       minutesListened,
-      days
+      days,
+      mostActiveYear,
+      mostActiveMonth
     });
   }, [filteredHistory, dateRange]);
 
@@ -179,25 +206,25 @@ export default function HistoryPage() {
                 </div>
               </div>
 
-              <div>
-                <h3 className={styles.statsLabel}>Most Active...</h3>
-                <div className={styles.statsSubItem}>
-                  <span className={styles.statsLabel}>Year</span>
-                  <span className={styles.statsValue}>-1</span>
-                </div>
-                <div className={styles.statsSubItem}>
-                  <span className={styles.statsLabel}>Month</span>
-                  <span className={styles.statsValue}>-1</span>
-                </div>
-                <div className={styles.statsSubItem}>
-                  <span className={styles.statsLabel}>Week</span>
-                  <span className={styles.statsValue}>-1</span>
-                </div>
-                <div className={styles.statsSubItem}>
-                  <span className={styles.statsLabel}>Day</span>
-                  <span className={styles.statsValue}>-1</span>
-                </div>
-              </div>
+               <div>
+                 <h3 className={styles.statsLabel}>Most Active...</h3>
+                 <div className={styles.statsSubItem}>
+                   <span className={styles.statsLabel}>Year</span>
+                   <span className={styles.statsValue}>{stats.mostActiveYear || "-"}</span>
+                 </div>
+                 <div className={styles.statsSubItem}>
+                   <span className={styles.statsLabel}>Month</span>
+                   <span className={styles.statsValue}>{stats.mostActiveMonth || "-"}</span>
+                 </div>
+                 <div className={styles.statsSubItem}>
+                   <span className={styles.statsLabel}>Week</span>
+                   <span className={styles.statsValue}>-</span>
+                 </div>
+                 <div className={styles.statsSubItem}>
+                   <span className={styles.statsLabel}>Day</span>
+                   <span className={styles.statsValue}>-</span>
+                 </div>
+               </div>
             </div>
           </div>
         </div>
