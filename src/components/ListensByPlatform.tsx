@@ -77,7 +77,7 @@ const ListensByPlatform: React.FC<ListensByPlatformProps> = ({ history }) => {
       yAxis: yAxis,
       valueXField: "value",
       categoryYField: "platform",
-      fill: Color.fromHex(0x00FF8C),
+      fill: Color.fromHex(0x0ADB6C),
       tooltip: am5.Tooltip.new(root, {
         labelText: "{valueX} listens"
       })
@@ -162,7 +162,7 @@ const ListensByPlatform: React.FC<ListensByPlatformProps> = ({ history }) => {
   }, [history]);
 
   return (
-    <div id="ListensByPlatformDiv" style={{ width: "100%", minHeight: 300, marginLeft: 5, marginBottom: 8 }}></div>
+    <div id="ListensByPlatformDiv" style={{ width: "100%", minHeight: 300, marginLeft: 8, marginBottom: 8 }}></div>
   );
 };
 

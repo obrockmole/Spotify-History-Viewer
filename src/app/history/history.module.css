@@ -1,7 +1,6 @@
 .container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
   padding: 1rem;
   gap: 1rem;
   background-color: #121212;
@@ -71,7 +70,7 @@
 
 .footer {
   text-align: center;
-  color: #a0a0a0;
+  color: #A0A0A0;
   margin-top: 1rem;
   padding-bottom: 2rem;
   clear: both;

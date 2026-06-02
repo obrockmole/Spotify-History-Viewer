@@ -79,7 +79,7 @@ const ListensOverTime: React.FC<ListensOverTimeProps> = ({ history }) => {
       yAxis: yAxis,
       valueYField: "value",
       valueXField: "date",
-      fill: Color.fromHex(0x00FF8C),
+      fill: Color.fromHex(0x05F073),
       tooltip: am5.Tooltip.new(root, {
         labelText: "{valueX.formatDate('MMMM yyyy')}: {valueY} listens"
       })

@@ -47,7 +47,7 @@ const ListensByCountry: React.FC<ListensByCountryProps> = ({ history }) => {
     }])
 
     polygonSeries.mapPolygons.template.states.create("hover", {
-      fill: am5.color(0x00cc70)
+      fill: am5.color(0x00CC70)
     })
 
     polygonSeries.mapPolygons.template.setAll({
