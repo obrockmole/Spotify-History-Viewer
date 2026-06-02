@@ -8,6 +8,7 @@ import Timeline from "@/components/Timeline";
 import { Listen } from "@/types";
 import ListensOverTime from "@/components/ListensOverTime";
 import ListensByPlatform from "@/components/ListensByPlatform";
+import ListensByCountry from "@/components/ListensByCountry";
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -246,7 +247,7 @@ export default function HistoryPage() {
           </div>
           <div className={styles.cardDivider}></div>
           <div className={styles.cardBody}>
-            <p className="text-2xl" style={{textAlign: "center"}}>🚧 Work in Progress 🚧</p>
+            <ListensByCountry history={filteredHistory} />
           </div>
         </div>
       </div>
