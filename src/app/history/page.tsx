@@ -6,6 +6,7 @@ import { useHistory } from "@/context/HistoryContext";
 import styles from "./history.module.css";
 import Timeline from "@/components/Timeline";
 import { Listen } from "@/types";
+import ListensOverTime from "@/components/ListensOverTime";
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -61,15 +62,25 @@ export default function HistoryPage() {
       const monthKey = `${String(date.getMonth() + 1)}-${date.getFullYear()}`;
       monthMap.set(monthKey, (monthMap.get(monthKey) || 0) + 1);
     });
-    
-    const mostActiveYear = Array.from(yearMap.entries()).reduce((a, b) => b[1] > a[1] ? b : a)[0].toString();
+
+    const mostActiveYear = (() => {
+      const entries = Array.from(yearMap.entries());
+      if (entries.length === 0) {
+        return "";
+      }
+      return entries.reduce((a, b) => b[1] > a[1] ? b : a)[0].toString();
+    })();
 
     const mostActiveMonth = (() => {
-          const monthKey = Array.from(monthMap.entries()).reduce((a, b) => b[1] > a[1] ? b : a)[0];
-          const [month, year] = monthKey.split('-');
-          const monthName = months[parseInt(month) - 1];
-          return `${monthName} ${year}`;
-        })();
+      const entries = Array.from(monthMap.entries());
+      if (entries.length === 0) {
+        return "";
+      }
+      const monthKey = entries.reduce((a, b) => b[1] > a[1] ? b : a)[0];
+      const [month, year] = monthKey.split('-');
+      const monthName = months[parseInt(month) - 1] || month;
+      return `${monthName} ${year}`;
+    })();
 
     setStats({
       listens: filteredHistory.length,
@@ -120,7 +131,7 @@ export default function HistoryPage() {
             </div>
             <div className={styles.cardDivider}></div>
             <div className={styles.cardBody}>
-                <p className="text-2xl" style={{textAlign: "center"}}>🚧 Work in Progress 🚧</p>
+              <ListensOverTime history={history} />
             </div>
           </div>
 

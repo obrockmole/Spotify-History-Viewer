@@ -47,7 +47,7 @@ const Timeline: React.FC<TimelineProps> = ({ history, onRangeChange }) => {
       return;
     }
 
-    const root = am5.Root.new("chartdiv");
+    const root = am5.Root.new("TimelineDiv");
 
     const chart = root.container.children.push(XYChart.new(root, {
       paddingTop: 0,
@@ -163,7 +163,7 @@ const Timeline: React.FC<TimelineProps> = ({ history, onRangeChange }) => {
   }, [history, onRangeChange, dateAxisChanged]);
 
   return (
-    <div id="chartdiv" style={{ height: "50px" }}></div>
+    <div id="TimelineDiv" style={{ height: "50px" }}></div>
   );
 };
 
