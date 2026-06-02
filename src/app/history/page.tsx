@@ -125,47 +125,22 @@ export default function HistoryPage() {
       </div>
 
       <div className={styles.mainContent}>
-        <div className={styles.leftColumn}>
-          <div className={`${styles.card} ${styles.topRow}`}>
-            <div className={styles.cardBody}>
-              <h2 className={styles.cardTitle}>Listens Over Time</h2>
-            </div>
-            <div className={styles.cardDivider}></div>
-            <div className={styles.cardBody}>
-              <ListensOverTime history={filteredHistory}/>
-            </div>
+        <div className={`${styles.card} ${styles.topRow}`}>
+          <div className={styles.cardBody}>
+            <h2 className={styles.cardTitle}>Listens Over Time</h2>
           </div>
-
-          <div className={styles.bottomRow}>
-            <div className={`${styles.card} ${styles.bottomCard}`}>
-              <div className={styles.cardBody}>
-                <h2 className={styles.cardTitle}>Activity by Day/Week</h2>
-              </div>
-              <div className={styles.cardDivider}></div>
-              <div className={styles.cardBody}>
-                <p className="text-2xl" style={{textAlign: "center"}}>🚧 Work in Progress 🚧</p>
-              </div>
-            </div>
-
-            <div className={`${styles.card} ${styles.bottomCard}`}>
-              <div className={styles.cardBody}>
-                <h2 className={styles.cardTitle}>Listens by Platform</h2>
-              </div>
-              <div className={styles.cardDivider}></div>
-              <div className={styles.cardBody}>
-                <ListensByPlatform history={filteredHistory}/>
-              </div>
-            </div>
+          <div className={styles.cardDivider}></div>
+          <div className={styles.cardBody}>
+            <ListensOverTime history={filteredHistory} />
           </div>
         </div>
 
-        <div className={`${styles.card} ${styles.rightColumn}`}>
+
+        <div className={`${styles.card} ${styles.statsCard}`}>
           <div className={styles.cardBody}>
             <h2 className={styles.cardTitle}>Listening Stats</h2>
           </div>
-
           <div className={styles.cardDivider}></div>
-
           <div className={styles.cardBody}>
             <div className={styles.statsContainer}>
               <div className={styles.statsItem}>
@@ -218,29 +193,67 @@ export default function HistoryPage() {
                 </div>
               </div>
 
-               <div>
-                 <h3 className={styles.statsLabel}>Most Active...</h3>
-                 <div className={styles.statsSubItem}>
-                   <span className={styles.statsLabel}>Year</span>
-                   <span className={styles.statsValue}>{stats.mostActiveYear || "-"}</span>
-                 </div>
-                 <div className={styles.statsSubItem}>
-                   <span className={styles.statsLabel}>Month</span>
-                   <span className={styles.statsValue}>{stats.mostActiveMonth || "-"}</span>
-                 </div>
-                 <div className={styles.statsSubItem}>
-                   <span className={styles.statsLabel}>Week</span>
-                   <span className={styles.statsValue}>-</span>
-                 </div>
-                 <div className={styles.statsSubItem}>
-                   <span className={styles.statsLabel}>Day</span>
-                   <span className={styles.statsValue}>-</span>
-                 </div>
-               </div>
+              <div>
+                <h3 className={styles.statsLabel}>Most Active...</h3>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Year</span>
+                  <span className={styles.statsValue}>{stats.mostActiveYear || "-"}</span>
+                </div>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Month</span>
+                  <span className={styles.statsValue}>{stats.mostActiveMonth || "-"}</span>
+                </div>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Week</span>
+                  <span className={styles.statsValue}>-</span>
+                </div>
+                <div className={styles.statsSubItem}>
+                  <span className={styles.statsLabel}>Day</span>
+                  <span className={styles.statsValue}>-</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+
+        <div className={styles.bottomRow}>
+          <div className={styles.card}>
+            <div className={styles.cardBody}>
+              <h2 className={styles.cardTitle}>Activity by Day/Week</h2>
+            </div>
+            <div className={styles.cardDivider}></div>
+            <div className={styles.cardBody}>
+              <p className="text-2xl" style={{textAlign: "center"}}>🚧 Work in Progress 🚧</p>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles.cardBody}>
+              <h2 className={styles.cardTitle}>Listens by Platform</h2>
+            </div>
+            <div className={styles.cardDivider}></div>
+            <div className={styles.cardBody}>
+              <ListensByPlatform history={filteredHistory} />
+            </div>
+          </div>
+        </div>
+
+
+        <div className={`${styles.card} ${styles.countryCard}`}>
+          <div className={styles.cardBody}>
+            <h2 className={styles.cardTitle}>Listens by Country</h2>
+          </div>
+          <div className={styles.cardDivider}></div>
+          <div className={styles.cardBody}>
+            <p className="text-2xl" style={{textAlign: "center"}}>🚧 Work in Progress 🚧</p>
+          </div>
+        </div>
       </div>
+
+      <footer className={styles.footer}>
+        © 2026 obrockmole. All rights reserved.
+      </footer>
     </div>
   )
 }

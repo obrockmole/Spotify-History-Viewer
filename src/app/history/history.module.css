@@ -53,39 +53,28 @@
 }
 
 .mainContent {
-  display: flex;
-  flex: 1 1 0;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
   gap: 1rem;
-  min-height: 0;
-}
-
-.leftColumn {
-  display: flex;
-  flex-direction: column;
-  width: 66.67%;
-  gap: 1rem;
-}
-
-.rightColumn {
-  width: 33.33%;
-}
-
-.topRow {
-  flex: 1 1 0;
+  align-items: stretch;
 }
 
 .bottomRow {
-  display: flex;
-  flex: 1 1 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
 
-.bottomCard {
-  flex: 1 1 0;
+.statsCard, .countryCard {
+  height: 100%;
 }
 
-.bottomRightCard {
-  flex: 1 1 0;
+.footer {
+  text-align: center;
+  color: #a0a0a0;
+  margin-top: 1rem;
+  padding-bottom: 2rem;
+  clear: both;
 }
 
 .statsContainer {
