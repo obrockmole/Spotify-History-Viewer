@@ -131,7 +131,7 @@ export default function HistoryPage() {
             </div>
             <div className={styles.cardDivider}></div>
             <div className={styles.cardBody}>
-              <ListensOverTime history={history} />
+              <ListensOverTime history={filteredHistory} />
             </div>
           </div>
 

@@ -23,13 +23,10 @@ interface AggregatedData {
 }
 
 const ListensOverTime: React.FC<ListensOverTimeProps> = ({ history }) => {
-  const chartRef = useRef<am5.Root | null>(null);
+  const rootRef = useRef<am5.Root | null>(null);
+  const seriesRef = useRef<ColumnSeries | null>(null);
 
   useLayoutEffect(() => {
-    if (history.length === 0) {
-      return;
-    }
-
     const root = am5.Root.new("ListensOverTimeDiv");
 
     const chart = root.container.children.push(
@@ -38,7 +35,7 @@ const ListensOverTime: React.FC<ListensOverTimeProps> = ({ history }) => {
         panY: false,
         wheelX: "none",
         wheelY: "none",
-        paddingLeft:0
+        paddingLeft: 0
       })
     );
 
@@ -96,6 +93,19 @@ const ListensOverTime: React.FC<ListensOverTimeProps> = ({ history }) => {
 
     chart.series.push(series);
 
+    rootRef.current = root;
+    seriesRef.current = series;
+
+    return () => {
+      root.dispose();
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!seriesRef.current || history.length === 0) {
+      return;
+    }
+
     const data = history.map(item => ({
       date: new Date(item.ts).getTime(),
       value: 1
@@ -125,13 +135,8 @@ const ListensOverTime: React.FC<ListensOverTimeProps> = ({ history }) => {
     });
 
     aggregatedData.sort((a, b) => a.date - b.date);
-    series.data.setAll(aggregatedData);
 
-    chartRef.current = root;
-
-    return () => {
-      root.dispose();
-    };
+    seriesRef.current.data.setAll(aggregatedData);
   }, [history]);
 
   return (
