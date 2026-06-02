@@ -15,23 +15,23 @@ import {
 } from "@amcharts/amcharts5/xy";
 import {Color} from "@amcharts/amcharts5";
 
-interface ListensByDeviceProps {
+interface ListensByPlatformProps {
   history: Listen[];
 }
 
 interface AggregatedData {
-  device: string;
+  platform: string;
   value: number;
 }
 
-const ListensByDevice: React.FC<ListensByDeviceProps> = ({ history }) => {
+const ListensByPlatform: React.FC<ListensByPlatformProps> = ({ history }) => {
   const rootRef = useRef<am5.Root | null>(null);
   const seriesRef = useRef<ColumnSeries | null>(null);
   const yAxisRef = useRef<CategoryAxis<AxisRenderer> | null>(null)
   const xAxisRef = useRef<ValueAxis<AxisRenderer> | null>(null)
 
   useLayoutEffect(() => {
-    const root = am5.Root.new("ListensByDeviceDiv");
+    const root = am5.Root.new("ListensByPlatformDiv");
 
     const chart = root.container.children.push(
       XYChart.new(root, {
@@ -61,7 +61,7 @@ const ListensByDevice: React.FC<ListensByDeviceProps> = ({ history }) => {
 
     const yAxis = chart.yAxes.push(
       CategoryAxis.new(root, {
-        categoryField: "device",
+        categoryField: "platform",
         renderer: AxisRendererY.new(root, {
           inversed: true,
           visible: false
@@ -76,7 +76,7 @@ const ListensByDevice: React.FC<ListensByDeviceProps> = ({ history }) => {
       xAxis: xAxis,
       yAxis: yAxis,
       valueXField: "value",
-      categoryYField: "device",
+      categoryYField: "platform",
       fill: Color.fromHex(0x00FF8C),
       tooltip: am5.Tooltip.new(root, {
         labelText: "{valueX} listens"
@@ -140,31 +140,30 @@ const ListensByDevice: React.FC<ListensByDeviceProps> = ({ history }) => {
     const dataMap: { [key: string]: number } = {};
 
     history.forEach(item => {
-      const device = item.platform || "Unknown";
+      const platform = item.platform || "Unknown";
 
-      if (dataMap[device]) {
-        dataMap[device]++;
+      if (dataMap[platform]) {
+        dataMap[platform]++;
       } else {
-        dataMap[device] = 1;
+        dataMap[platform] = 1;
       }
     });
 
-    const aggregatedData: AggregatedData[] = Object.keys(dataMap).map(device => ({
-      device,
-      value: dataMap[device]
+    const aggregatedData: AggregatedData[] = Object.keys(dataMap).map(platform => ({
+      platform,
+      value: dataMap[platform]
     }));
 
     aggregatedData.sort((a, b) => b.value - a.value);
+    const filteredData = aggregatedData.slice(0, 10);
 
-    const topData = aggregatedData.slice(0, 10);
-
-    yAxisRef.current.data.setAll(topData);
-    seriesRef.current.data.setAll(topData);
+    yAxisRef.current.data.setAll(filteredData);
+    seriesRef.current.data.setAll(filteredData);
   }, [history]);
 
   return (
-    <div id="ListensByDeviceDiv" style={{ width: "100%", minHeight: 300, marginLeft: 5, marginBottom: 8 }}></div>
+    <div id="ListensByPlatformDiv" style={{ width: "100%", minHeight: 300, marginLeft: 5, marginBottom: 8 }}></div>
   );
 };
 
-export default ListensByDevice;
+export default ListensByPlatform;

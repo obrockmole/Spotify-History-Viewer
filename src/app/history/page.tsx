@@ -7,7 +7,7 @@ import styles from "./history.module.css";
 import Timeline from "@/components/Timeline";
 import { Listen } from "@/types";
 import ListensOverTime from "@/components/ListensOverTime";
-import ListensByDevice from "@/components/ListensByDevice";
+import ListensByPlatform from "@/components/ListensByPlatform";
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -149,11 +149,11 @@ export default function HistoryPage() {
 
             <div className={`${styles.card} ${styles.bottomCard}`}>
               <div className={styles.cardBody}>
-                <h2 className={styles.cardTitle}>Listens by Device</h2>
+                <h2 className={styles.cardTitle}>Listens by Platform</h2>
               </div>
               <div className={styles.cardDivider}></div>
               <div className={styles.cardBody}>
-                <ListensByDevice history={filteredHistory}/>
+                <ListensByPlatform history={filteredHistory}/>
               </div>
             </div>
           </div>
