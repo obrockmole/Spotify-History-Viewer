@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useCallback, useLayoutEffect, useRef} from "react";
+import React, {useCallback, useEffect, useLayoutEffect, useRef} from "react";
 import * as am5 from "@amcharts/amcharts5";
 import { Listen } from "@/types";
 import {
@@ -27,6 +27,7 @@ interface AggregatedData {
 const Timeline: React.FC<TimelineProps> = ({ history, onRangeChange }) => {
   const chartRef = useRef<am5.Root | null>(null);
   const xAxisRef = useRef<DateAxis<AxisRenderer> | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const dateAxisChanged = useCallback((ev: { start: number; end: number }) => {
     if (xAxisRef.current) {
@@ -37,10 +38,24 @@ const Timeline: React.FC<TimelineProps> = ({ history, onRangeChange }) => {
         [start, end] = [end, start];
       }
       if (!isNaN(start) && !isNaN(end)) {
-        onRangeChange(start, end);
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+
+        timeoutRef.current = setTimeout(() => {
+          onRangeChange(start, end);
+        }, 250);
       }
     }
   }, [onRangeChange]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   useLayoutEffect(() => {
     if (history.length === 0) {
