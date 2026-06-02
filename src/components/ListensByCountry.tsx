@@ -2,130 +2,62 @@
 
 import React, {useLayoutEffect, useRef} from "react";
 import * as am5 from "@amcharts/amcharts5";
+import * as am5map from "@amcharts/amcharts5/map"
+import am5geodata_worldLow from "@amcharts/amcharts5-geodata/worldLow"
 import { Listen } from "@/types";
-import {
-  AxisRenderer,
-  AxisRendererX,
-  AxisRendererY,
-  CategoryAxis,
-  ColumnSeries,
-  ValueAxis,
-  XYChart,
-  XYCursor
-} from "@amcharts/amcharts5/xy";
-import {Color} from "@amcharts/amcharts5";
 
 interface ListensByCountryProps {
   history: Listen[];
 }
 
-interface AggregatedData {
-  country: string;
-  value: number;
-}
-
 const ListensByCountry: React.FC<ListensByCountryProps> = ({ history }) => {
-  const rootRef = useRef<am5.Root | null>(null);
-  const seriesRef = useRef<ColumnSeries | null>(null);
-  const yAxisRef = useRef<CategoryAxis<AxisRenderer> | null>(null)
-  const xAxisRef = useRef<ValueAxis<AxisRenderer> | null>(null)
+  const rootRef = useRef<am5.Root | null>(null)
+  const seriesRef = useRef<am5map.MapPolygonSeries | null>(null)
 
   useLayoutEffect(() => {
-    const root = am5.Root.new("ListensByCountryDiv");
+    const root = am5.Root.new("ListensByCountryDiv")
 
     const chart = root.container.children.push(
-      XYChart.new(root, {
-        panX: false,
-        panY: false,
-        wheelX: "none",
-        wheelY: "none",
-        paddingLeft: 0
-      })
-    );
-
-    const cursor = chart.set("cursor", XYCursor.new(root, {}));
-    cursor.lineX.set("visible", false);
-    cursor.lineY.set("visible", false);
-
-    const xAxis = chart.xAxes.push(
-      ValueAxis.new(root, {
-        min: 0,
-        strictMinMax: true,
-        renderer: AxisRendererX.new(root, {
-          visible: false
-        })
+      am5map.MapChart.new(root, {
+        panX: "translateX",
+        panY: "translateY",
+        projection: am5map.geoMercator(),
+        paddingLeft: 0,
+        paddingRight: 0,
+        paddingBottom: 0,
+        paddingTop: 0
       })
     )
-    xAxis.get("renderer").grid.template.set("forceHidden", true)
-    xAxis.get("renderer").labels.template.set("forceHidden", true)
 
-    const yAxis = chart.yAxes.push(
-      CategoryAxis.new(root, {
-        categoryField: "country",
-        renderer: AxisRendererY.new(root, {
-          inversed: true,
-          visible: false
-        })
+    const polygonSeries = chart.series.push(
+      am5map.MapPolygonSeries.new(root, {
+        geoJSON: am5geodata_worldLow,
+        valueField: "value",
+        calculateAggregates: true,
+        exclude: ["AQ"]
       })
     )
-    yAxis.get("renderer").grid.template.set("forceHidden", true)
-    yAxis.get("renderer").labels.template.set("forceHidden", true)
 
-    const series = ColumnSeries.new(root, {
-      name: "Series",
-      xAxis: xAxis,
-      yAxis: yAxis,
-      valueXField: "value",
-      categoryYField: "country",
-      fill: Color.fromHex(0x00FF8C),
-      tooltip: am5.Tooltip.new(root, {
-        labelText: "{valueX} listens"
-      })
+    polygonSeries.set("heatRules", [{
+      target: polygonSeries.mapPolygons.template,
+      dataField: "value",
+      min: am5.color(0x236744),
+      max: am5.color(0x00FF8C),
+      key: "fill"
+    }])
+
+    polygonSeries.mapPolygons.template.states.create("hover", {
+      fill: am5.color(0x00cc70)
     })
 
-    series.columns.template.setAll({
-      cornerRadiusBR: 3,
-      cornerRadiusTR: 3,
-      strokeOpacity: 0,
-      height: am5.percent(70)
-    })
-
-    series.bullets.push(() => {
-      return am5.Bullet.new(root, {
-        locationX: 0,
-        sprite: am5.Label.new(root, {
-          text: "{categoryY}",
-          fill: am5.color(0x000000),
-          centerY: am5.p50,
-          centerX: am5.p0,
-          dx: 10,
-          populateText: true,
-          fontWeight: "bold"
-        })
-      })
-    })
-
-    series.bullets.push(() => {
-      return am5.Bullet.new(root, {
-        locationX: 1,
-        sprite: am5.Label.new(root, {
-          text: "{valueX}",
-          fill: am5.color(0x000000),
-          centerY: am5.p50,
-          centerX: am5.p100,
-          dx: -10,
-          populateText: true,
-          fontWeight: "bold"
-        })
-      })
-    })
-
-    chart.series.push(series)
+    polygonSeries.mapPolygons.template.setAll({
+      tooltipText: "{name}: {value} listens",
+      fill: am5.color(0x333333),
+      stroke: am5.color(0x111111),
+    });
 
     rootRef.current = root
-    seriesRef.current = series
-    xAxisRef.current = xAxis
-    yAxisRef.current = yAxis
+    seriesRef.current = polygonSeries
 
     return () => {
       root.dispose()
@@ -133,36 +65,34 @@ const ListensByCountry: React.FC<ListensByCountryProps> = ({ history }) => {
   }, [])
 
   useLayoutEffect(() => {
-    if (!seriesRef.current || !yAxisRef.current || history.length === 0) {
+    if (!seriesRef.current || history.length === 0) {
       return;
     }
 
     const dataMap: { [key: string]: number } = {};
 
     history.forEach(item => {
-      const country = item.conn_country || "Unknown";
+      const country = item.conn_country.toUpperCase().trim()
 
-      if (dataMap[country]) {
-        dataMap[country]++;
-      } else {
-        dataMap[country] = 1;
+      if (country) {
+        if (dataMap[country]) {
+          dataMap[country]++
+        } else {
+          dataMap[country] = 1
+        }
       }
-    });
+    })
 
-    const aggregatedData: AggregatedData[] = Object.keys(dataMap).map(country => ({
-      country,
+    const aggregatedData = Object.keys(dataMap).map(country => ({
+      id: country,
       value: dataMap[country]
     }));
 
-    aggregatedData.sort((a, b) => b.value - a.value);
-    const filteredData = aggregatedData.slice(0, 10);
-
-    yAxisRef.current.data.setAll(filteredData);
-    seriesRef.current.data.setAll(filteredData);
+    seriesRef.current.data.setAll(aggregatedData);
   }, [history]);
 
   return (
-    <div id="ListensByCountryDiv" style={{ width: "100%", minHeight: 300, marginLeft: 5, marginBottom: 8 }}></div>
+    <div id="ListensByCountryDiv" style={{ width: "100%", minHeight: 300, marginLeft: 8, marginBottom: 8 }}></div>
   );
 };
 

@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@amcharts/amcharts5": "^5.17.2",
-    "next": "16.2.3",
+    "@amcharts/amcharts5-geodata": "^5.1.5",
+    "next": "^16.2.7",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
