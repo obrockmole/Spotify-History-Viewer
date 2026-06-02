@@ -7,12 +7,13 @@ import styles from "./history.module.css";
 import Timeline from "@/components/Timeline";
 import { Listen } from "@/types";
 import ListensOverTime from "@/components/ListensOverTime";
+import ListensByDevice from "@/components/ListensByDevice";
 
 export default function HistoryPage() {
   const router = useRouter();
-  const { history } = useHistory();
+  const {history} = useHistory();
   const [filteredHistory, setFilteredHistory] = useState<Listen[]>(history);
-  const [dateRange, setDateRange] = useState<{ start: number | null, end: number | null }>({ start: null, end: null });
+  const [dateRange, setDateRange] = useState<{ start: number | null, end: number | null }>({start: null, end: null});
 
   const [stats, setStats] = useState({
     listens: 0,
@@ -95,7 +96,7 @@ export default function HistoryPage() {
   }, [filteredHistory, dateRange]);
 
   const handleRangeChange = useCallback((start: number, end: number) => {
-    setDateRange({ start, end });
+    setDateRange({start, end});
     const newFilteredHistory = history.filter(item => {
       const itemDate = new Date(item.ts).getTime();
       return itemDate >= start && itemDate <= end;
@@ -111,7 +112,7 @@ export default function HistoryPage() {
 
       <div className={styles.card}>
         <div className={`${styles.cardBody} ${styles.timelineCardBody}`}>
-          <Timeline history={history} onRangeChange={handleRangeChange} />
+          <Timeline history={history} onRangeChange={handleRangeChange}/>
         </div>
       </div>
 
@@ -131,28 +132,28 @@ export default function HistoryPage() {
             </div>
             <div className={styles.cardDivider}></div>
             <div className={styles.cardBody}>
-              <ListensOverTime history={filteredHistory} />
+              <ListensOverTime history={filteredHistory}/>
             </div>
           </div>
 
           <div className={styles.bottomRow}>
-            <div className={`${styles.card} ${styles.bottomLeftCard}`}>
+            <div className={`${styles.card} ${styles.bottomCard}`}>
               <div className={styles.cardBody}>
                 <h2 className={styles.cardTitle}>Activity by Day/Week</h2>
               </div>
               <div className={styles.cardDivider}></div>
               <div className={styles.cardBody}>
-                  <p className="text-2xl" style={{textAlign: "center"}}>🚧 Work in Progress 🚧</p>
+                <p className="text-2xl" style={{textAlign: "center"}}>🚧 Work in Progress 🚧</p>
               </div>
             </div>
 
-            <div className={`${styles.card} ${styles.bottomRightCard}`}>
+            <div className={`${styles.card} ${styles.bottomCard}`}>
               <div className={styles.cardBody}>
                 <h2 className={styles.cardTitle}>Listens by Device</h2>
               </div>
               <div className={styles.cardDivider}></div>
               <div className={styles.cardBody}>
-                  <p className="text-2xl" style={{textAlign: "center"}}>🚧 Work in Progress 🚧</p>
+                <ListensByDevice history={filteredHistory}/>
               </div>
             </div>
           </div>
