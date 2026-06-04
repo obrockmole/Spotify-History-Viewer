@@ -72,9 +72,11 @@ const ListensByCountry: React.FC<ListensByCountryProps> = ({ history }) => {
     const dataMap: { [key: string]: number } = {};
 
     history.forEach(item => {
-      const country = item.conn_country.toUpperCase().trim()
+      let country = item.conn_country
 
       if (country) {
+        country = country.toUpperCase().trim()
+
         if (dataMap[country]) {
           dataMap[country]++
         } else {
