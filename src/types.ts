@@ -12,6 +12,6 @@ export interface Listen {
   shuffle: boolean;
   skipped: boolean;
   offline: boolean;
-  offline_timestamp: number,
+  offline_timestamp: number;
   incognito_mode: boolean;
 }

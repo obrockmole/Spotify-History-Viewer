@@ -12,7 +12,7 @@ export default function Home() {
   const router = useRouter();
   const { setHistory } = useHistory();
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) {
       return;
@@ -22,50 +22,27 @@ export default function Home() {
     setError(null);
     setIsProcessing(true);
 
-    let allEntries: Listen[] = [];
-    const filePromises = Array.from(files).map(file => {
-      return new Promise<Listen[]>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          try {
-            const content = e.target?.result;
-            if (typeof content === "string") {
-              const data = JSON.parse(content);
-              if (Array.isArray(data)) {
-                resolve(data);
-              } else {
-                reject(new Error("Invalid JSON format."));
-              }
-            }
+    try {
+      const parsedArrays = await Promise.all(
+        Array.from(files).map(async (file) => {
+          const text = await file.text();
+          const data = JSON.parse(text);
 
-          } catch (err) {
-            console.error(err);
-            reject(new Error(`Error parsing ${file.name}.`));
+          if (!Array.isArray(data)) {
+            throw new Error(`Invalid JSON in ${file.name}`);
           }
-        };
 
-        reader.onerror = () => {
-          reject(new Error(`Error reading ${file.name}.`));
-        };
-        reader.readAsText(file);
-      });
-    });
+          return data as Listen[];
+        })
+      );
 
-    Promise.all(filePromises)
-      .then(results => {
-        allEntries = results.flat();
-        setHistory(allEntries);
-        setIsProcessing(false);
-      })
-
-      .catch(err => {
-        if (err instanceof Error) {
-            setError(err.message);
-        } else {
-            setError(String(err));
-        }
-        setIsProcessing(false);
-      });
+      const allEntries = parsedArrays.flat();
+      setHistory(allEntries);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -95,9 +72,9 @@ export default function Home() {
         </div>
 
         {isProcessing && (
-            <div className="mt-8 text-lg">
-                <p>Loading...</p>
-            </div>
+          <div className="mt-8 text-lg">
+            <p>Loading...</p>
+          </div>
         )}
 
         {fileNames.length > 0 && !isProcessing && (
@@ -107,10 +84,10 @@ export default function Home() {
             </p>
 
             <button
-                onClick={() => router.push('/history')}
-                className="mt-4 cursor-pointer inline-flex items-center justify-center rounded-full bg-green-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-green-700"
+              onClick={() => router.push("/history")}
+              className="mt-4 cursor-pointer inline-flex items-center justify-center rounded-full bg-green-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-green-700"
             >
-                View History
+              View History
             </button>
           </div>
         )}

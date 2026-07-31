@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState, useMemo} from "react";
 import { useHistory } from "@/context/HistoryContext";
 import styles from "./history.module.css";
 import Timeline from "@/components/Timeline";
@@ -16,16 +16,6 @@ export default function HistoryPage() {
   const [filteredHistory, setFilteredHistory] = useState<Listen[]>(history);
   const [dateRange, setDateRange] = useState<{ start: number | null, end: number | null }>({start: null, end: null});
 
-  const [stats, setStats] = useState({
-    listens: 0,
-    uniqueSongs: 0,
-    skippedSongs: 0,
-    uniqueArtists: 0,
-    minutesListened: 0,
-    days: 0,
-    mostActiveYear: "",
-    mostActiveMonth: ""
-  });
 
   useEffect(() => {
     if (history.length === 0) {
@@ -37,7 +27,7 @@ export default function HistoryPage() {
     setFilteredHistory(history);
   }, [history]);
 
-  useEffect(() => {
+  const stats = useMemo(() => {
     const artists = new Set(filteredHistory.map(item => item.master_metadata_album_artist_name));
     const totalMs = filteredHistory.reduce((acc, item) => acc + item.ms_played, 0);
     const minutesListened = Math.round(totalMs / 60000);
@@ -57,8 +47,7 @@ export default function HistoryPage() {
 
     filteredHistory.forEach(item => {
       const date = new Date(item.ts);
-
-      const year = new Date(item.ts).getFullYear();
+      const year = date.getFullYear();
       yearMap.set(year, (yearMap.get(year) || 0) + 1);
 
       const monthKey = `${String(date.getMonth() + 1)}-${date.getFullYear()}`;
@@ -84,7 +73,7 @@ export default function HistoryPage() {
       return `${monthName} ${year}`;
     })();
 
-    setStats({
+    return {
       listens: filteredHistory.length,
       uniqueSongs: uniqueSongs.size,
       skippedSongs,
@@ -93,7 +82,7 @@ export default function HistoryPage() {
       days,
       mostActiveYear,
       mostActiveMonth
-    });
+    };
   }, [filteredHistory, dateRange]);
 
   const handleRangeChange = useCallback((start: number, end: number) => {
