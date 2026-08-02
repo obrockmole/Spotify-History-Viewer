@@ -12,6 +12,7 @@ import {
   XYChart, XYCursor
 } from "@amcharts/amcharts5/xy";
 import {Color} from "@amcharts/amcharts5";
+import {useHistory} from "@/context/HistoryContext";
 
 interface ListensOverTimeProps {
   history: Listen[];
@@ -25,6 +26,7 @@ interface AggregatedData {
 const ListensOverTime: React.FC<ListensOverTimeProps> = ({ history }) => {
   const rootRef = useRef<am5.Root | null>(null);
   const seriesRef = useRef<ColumnSeries | null>(null);
+  const { monthlyData } = useHistory();
 
   useLayoutEffect(() => {
     const root = am5.Root.new("ListensOverTimeDiv");
@@ -106,6 +108,11 @@ const ListensOverTime: React.FC<ListensOverTimeProps> = ({ history }) => {
       return;
     }
 
+    if (monthlyData && monthlyData.length > 0) {
+      seriesRef.current.data.setAll(monthlyData);
+      return;
+    }
+
     const data = history.map(item => ({
       date: new Date(item.ts).getTime(),
       value: 1
@@ -120,11 +127,7 @@ const ListensOverTime: React.FC<ListensOverTimeProps> = ({ history }) => {
       date.setHours(0, 0, 0, 0);
       const monthTimestamp = date.getTime();
 
-      if (dataMap[monthTimestamp]) {
-        dataMap[monthTimestamp]++;
-      } else {
-        dataMap[monthTimestamp] = 1;
-      }
+      dataMap[monthTimestamp] = (dataMap[monthTimestamp] || 0) + 1;
     });
 
     Object.keys(dataMap).forEach(month => {

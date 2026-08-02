@@ -5,6 +5,7 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5map from "@amcharts/amcharts5/map"
 import am5geodata_worldLow from "@amcharts/amcharts5-geodata/worldLow"
 import { Listen } from "@/types";
+import {useHistory} from "@/context/HistoryContext";
 
 interface ListensByCountryProps {
   history: Listen[];
@@ -13,6 +14,7 @@ interface ListensByCountryProps {
 const ListensByCountry: React.FC<ListensByCountryProps> = ({ history }) => {
   const rootRef = useRef<am5.Root | null>(null)
   const seriesRef = useRef<am5map.MapPolygonSeries | null>(null)
+  const { countryData } = useHistory()
 
   useLayoutEffect(() => {
     const root = am5.Root.new("ListensByCountryDiv")
@@ -69,6 +71,11 @@ const ListensByCountry: React.FC<ListensByCountryProps> = ({ history }) => {
       return;
     }
 
+    if (countryData && countryData.length > 0) {
+      seriesRef.current.data.setAll(countryData);
+      return;
+    }
+
     const dataMap: { [key: string]: number } = {};
 
     history.forEach(item => {
@@ -76,12 +83,7 @@ const ListensByCountry: React.FC<ListensByCountryProps> = ({ history }) => {
 
       if (country) {
         country = country.toUpperCase().trim()
-
-        if (dataMap[country]) {
-          dataMap[country]++
-        } else {
-          dataMap[country] = 1
-        }
+        dataMap[country] = (dataMap[country] || 0) + 1
       }
     })
 
@@ -91,7 +93,7 @@ const ListensByCountry: React.FC<ListensByCountryProps> = ({ history }) => {
     }));
 
     seriesRef.current.data.setAll(aggregatedData);
-  }, [history]);
+  }, [history, countryData]);
 
   return (
     <div id="ListensByCountryDiv" style={{ width: "100%", minHeight: 300, marginLeft: 8, marginBottom: 8 }}></div>

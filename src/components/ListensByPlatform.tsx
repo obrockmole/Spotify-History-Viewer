@@ -14,6 +14,7 @@ import {
   XYCursor
 } from "@amcharts/amcharts5/xy";
 import {Color} from "@amcharts/amcharts5";
+import {useHistory} from "@/context/HistoryContext";
 
 interface ListensByPlatformProps {
   history: Listen[];
@@ -29,6 +30,7 @@ const ListensByPlatform: React.FC<ListensByPlatformProps> = ({ history }) => {
   const seriesRef = useRef<ColumnSeries | null>(null);
   const yAxisRef = useRef<CategoryAxis<AxisRenderer> | null>(null)
   const xAxisRef = useRef<ValueAxis<AxisRenderer> | null>(null)
+  const { platformData } = useHistory();
 
   useLayoutEffect(() => {
     const root = am5.Root.new("ListensByPlatformDiv");
@@ -137,16 +139,17 @@ const ListensByPlatform: React.FC<ListensByPlatformProps> = ({ history }) => {
       return;
     }
 
+    if (platformData && platformData.length > 0) {
+      yAxisRef.current.data.setAll(platformData);
+      seriesRef.current.data.setAll(platformData);
+      return;
+    }
+
     const dataMap: { [key: string]: number } = {};
 
     history.forEach(item => {
-      const platform = item.platform || "Unknown";
-
-      if (dataMap[platform]) {
-        dataMap[platform]++;
-      } else {
-        dataMap[platform] = 1;
-      }
+      const platform = (item.platform || "Unknown").trim();
+      dataMap[platform] = (dataMap[platform] || 0) + 1;
     });
 
     const aggregatedData: AggregatedData[] = Object.keys(dataMap).map(platform => ({
@@ -159,7 +162,7 @@ const ListensByPlatform: React.FC<ListensByPlatformProps> = ({ history }) => {
 
     yAxisRef.current.data.setAll(filteredData);
     seriesRef.current.data.setAll(filteredData);
-  }, [history]);
+  }, [history, platformData]);
 
   return (
     <div id="ListensByPlatformDiv" style={{ width: "100%", minHeight: 300, marginLeft: 8, marginBottom: 8 }}></div>

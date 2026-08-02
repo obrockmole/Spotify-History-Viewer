@@ -13,6 +13,7 @@ import {
   XYChart,
   XYChartScrollbar
 } from "@amcharts/amcharts5/xy";
+import {useHistory} from "@/context/HistoryContext";
 
 interface TimelineProps {
   history: Listen[];
@@ -28,6 +29,7 @@ const Timeline: React.FC<TimelineProps> = ({ history, onRangeChange }) => {
   const chartRef = useRef<am5.Root | null>(null);
   const xAxisRef = useRef<DateAxis<AxisRenderer> | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { dailyData } = useHistory();
 
   const dateAxisChanged = useCallback((ev: { start: number; end: number }) => {
     if (xAxisRef.current) {
@@ -138,35 +140,35 @@ const Timeline: React.FC<TimelineProps> = ({ history, onRangeChange }) => {
       visible: true,
     });
 
-    const data = history.map(item => ({
-      date: new Date(item.ts).getTime(),
-      value: 1
-    }));
+    if (dailyData && dailyData.length > 0) {
+      series.data.setAll(dailyData);
+    } else {
+      const data = history.map(item => ({
+        date: new Date(item.ts).getTime(),
+        value: 1
+      }));
 
-    const aggregatedData: AggregatedData[] = [];
-    const dataMap: { [key: number]: number } = {};
+      const aggregatedData: AggregatedData[] = [];
+      const dataMap: { [key: number]: number } = {};
 
-    data.forEach(item => {
-      const date = new Date(item.date);
-      date.setHours(0, 0, 0, 0);
-      const day = date.getTime();
+      data.forEach(item => {
+        const date = new Date(item.date);
+        date.setHours(0, 0, 0, 0);
+        const day = date.getTime();
 
-      if (dataMap[day]) {
-        dataMap[day]++;
-      } else {
-        dataMap[day] = 1;
-      }
-    });
-
-    Object.keys(dataMap).forEach(day => {
-      aggregatedData.push({
-        date: parseInt(day),
-        value: dataMap[parseInt(day)]
+        dataMap[day] = (dataMap[day] || 0) + 1;
       });
-    });
 
-    aggregatedData.sort((a, b) => a.date - b.date);
-    series.data.setAll(aggregatedData);
+      Object.keys(dataMap).forEach(day => {
+        aggregatedData.push({
+          date: parseInt(day),
+          value: dataMap[parseInt(day)]
+        });
+      });
+
+      aggregatedData.sort((a, b) => a.date - b.date);
+      series.data.setAll(aggregatedData);
+    }
 
     scrollbar.events.on("rangechanged", dateAxisChanged);
 
