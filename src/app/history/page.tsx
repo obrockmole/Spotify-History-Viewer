@@ -9,6 +9,7 @@ import { Listen } from "@/types";
 import ListensOverTime from "@/components/ListensOverTime";
 import ListensByPlatform from "@/components/ListensByPlatform";
 import ListensByCountry from "@/components/ListensByCountry";
+import TopSongListens from "@/components/TopSongListens";
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -210,11 +211,11 @@ export default function HistoryPage() {
         <div className={styles.bottomRow}>
           <div className={styles.card}>
             <div className={styles.cardBody}>
-              <h2 className={styles.cardTitle}>Activity by Day/Week</h2>
+              <h2 className={styles.cardTitle}>Top Songs by Listens</h2>
             </div>
             <div className={styles.cardDivider}></div>
             <div className={styles.cardBody}>
-              <p className="text-2xl" style={{textAlign: "center"}}>🚧 Work in Progress 🚧</p>
+              <TopSongListens history={filteredHistory} />
             </div>
           </div>
 

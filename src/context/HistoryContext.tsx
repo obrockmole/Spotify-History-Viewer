@@ -6,6 +6,7 @@ import { Listen } from "@/types";
 interface AggregatedData { date: number; value: number }
 interface PlatformData { platform: string; value: number }
 interface CountryData { id: string; value: number }
+interface SongData { song: string; value: number }
 
 interface Stats {
   listens: number;
@@ -25,6 +26,7 @@ interface HistoryContextType {
   monthlyData?: AggregatedData[];
   platformData?: PlatformData[];
   countryData?: CountryData[];
+  songData?: SongData[];
   stats?: Stats;
 }
 
@@ -36,7 +38,7 @@ function computeAggregates(history: Listen[]) {
   const platformMap: Record<string, number> = {};
   const countryMap: Record<string, number> = {};
   const artistSet = new Set<string>();
-  const songSet = new Set<string>();
+  const songMap: Record<string, number> = {};
   let totalSeconds = 0;
   let skipped = 0;
   let minTime = Infinity;
@@ -62,7 +64,7 @@ function computeAggregates(history: Listen[]) {
     }
 
     if (entry.master_metadata_track_name) {
-      songSet.add(entry.master_metadata_track_name);
+      songMap[entry.master_metadata_track_name] = (songMap[entry.master_metadata_track_name] || 0) + 1;
     }
     if (entry.master_metadata_album_artist_name) {
       artistSet.add(entry.master_metadata_album_artist_name);
@@ -86,6 +88,7 @@ function computeAggregates(history: Listen[]) {
   const monthly = Object.keys(monthMap).map(month => ({ date: parseInt(month), value: monthMap[parseInt(month)] })).sort((a, b) => a.date - b.date);
   const platforms = Object.keys(platformMap).map(platform => ({ platform: platform, value: platformMap[platform]})).sort((a, b) => b.value - a.value).slice(0, 10);
   const countries = Object.keys(countryMap).map(country => ({ id: country, value: countryMap[country]})).sort((a, b) => b.value - a.value);
+  const songListens = Object.keys(songMap).map(song => ({ song: song, value: songMap[song]})).sort((a, b) => b.value - a.value).slice(0, 10);
 
   const minutesListened = Math.round(totalSeconds / 60);
 
@@ -127,7 +130,7 @@ function computeAggregates(history: Listen[]) {
 
   const stats = {
     listens: history.length,
-    uniqueSongs: songSet.size,
+    uniqueSongs: songMap.size,
     uniqueArtists: artistSet.size,
     skippedSongs: skipped,
     minutesListened: minutesListened,
@@ -136,7 +139,7 @@ function computeAggregates(history: Listen[]) {
     mostActiveMonth: mostActiveMonth
   };
 
-  return { daily, monthly, platforms, countries, stats };
+  return { daily, monthly, platforms, countries, songListens, stats };
 }
 
 export function HistoryProvider({ children }: { children: ReactNode }) {
@@ -146,6 +149,7 @@ export function HistoryProvider({ children }: { children: ReactNode }) {
   const [monthly, setMonthly] = useState<AggregatedData[] | undefined>(undefined);
   const [platforms, setPlatforms] = useState<PlatformData[] | undefined>(undefined);
   const [countries, setCountries] = useState<CountryData[] | undefined>(undefined);
+  const [songListens, setSongListens] = useState<SongData[] | undefined>(undefined);
 
   const setHistory = (history: Listen[]) => {
     _setHistory(history);
@@ -157,11 +161,12 @@ export function HistoryProvider({ children }: { children: ReactNode }) {
       setMonthly(aggregates.monthly);
       setPlatforms(aggregates.platforms);
       setCountries(aggregates.countries);
+      setSongListens(aggregates.songListens)
     }, 0);
   };
 
   return (
-    <HistoryContext.Provider value={{ history, setHistory, dailyData: daily, monthlyData: monthly, platformData: platforms, countryData: countries, stats }}>
+    <HistoryContext.Provider value={{ history, setHistory, dailyData: daily, monthlyData: monthly, platformData: platforms, countryData: countries, songData: songListens, stats }}>
       {children}
     </HistoryContext.Provider>
   );
