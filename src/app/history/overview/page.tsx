@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useFilteredHistory } from "@/context/FilteredHistoryContext";
+import {useFilteredHistory} from "@/context/FilteredHistoryContext";
 import styles from "../history.module.css";
 import ListensOverTime from "@/components/ListensOverTime";
 import ListensByPlatform from "@/components/ListensByPlatform";
@@ -9,7 +9,7 @@ import ListensByCountry from "@/components/ListensByCountry";
 import TopSongListens from "@/components/TopSongListens";
 
 export default function OverviewPage() {
-    const { stats, monthlyData, platformData, countryData, songData } = useFilteredHistory();
+    const {stats, monthlyData, platformData, countryData, songData} = useFilteredHistory();
 
     return (
         <div className={styles.mainContent}>
@@ -19,7 +19,7 @@ export default function OverviewPage() {
                 </div>
                 <div className={styles.cardDivider}></div>
                 <div className={styles.cardBody}>
-                    <ListensOverTime data={monthlyData} />
+                    <ListensOverTime data={monthlyData}/>
                 </div>
             </div>
 
@@ -102,7 +102,7 @@ export default function OverviewPage() {
                     </div>
                     <div className={styles.cardDivider}></div>
                     <div className={styles.cardBody}>
-                        <TopSongListens data={songData} />
+                        <TopSongListens data={songData}/>
                     </div>
                 </div>
 
@@ -112,7 +112,7 @@ export default function OverviewPage() {
                     </div>
                     <div className={styles.cardDivider}></div>
                     <div className={styles.cardBody}>
-                        <ListensByPlatform data={platformData} />
+                        <ListensByPlatform data={platformData}/>
                     </div>
                 </div>
             </div>
@@ -123,7 +123,7 @@ export default function OverviewPage() {
                 </div>
                 <div className={styles.cardDivider}></div>
                 <div className={styles.cardBody}>
-                    <ListensByCountry data={countryData} />
+                    <ListensByCountry data={countryData}/>
                 </div>
             </div>
         </div>

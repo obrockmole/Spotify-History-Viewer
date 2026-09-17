@@ -1,17 +1,17 @@
 export interface Listen {
-  ts: string;
-  platform: string;
-  ms_played: number;
-  conn_country: string;
-  master_metadata_track_name: string;
-  master_metadata_album_artist_name: string;
-  master_metadata_album_album_name: string;
-  spotify_track_uri: string;
-  reason_start: string;
-  reason_end: string;
-  shuffle: boolean;
-  skipped: boolean;
-  offline: boolean;
-  offline_timestamp: number;
-  incognito_mode: boolean;
+    ts: string;
+    platform: string;
+    ms_played: number;
+    conn_country: string;
+    master_metadata_track_name: string;
+    master_metadata_album_artist_name: string;
+    master_metadata_album_album_name: string;
+    spotify_track_uri: string;
+    reason_start: string;
+    reason_end: string;
+    shuffle: boolean;
+    skipped: boolean;
+    offline: boolean;
+    offline_timestamp: number;
+    incognito_mode: boolean;
 }

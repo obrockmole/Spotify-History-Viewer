@@ -1,25 +1,25 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, {useCallback, useMemo, useState} from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import {usePathname} from "next/navigation";
 import styles from "./history.module.css";
 import Timeline from "@/components/Timeline";
-import { computeAggregates, useHistory } from "@/context/HistoryContext";
-import { FilteredHistoryProvider } from "@/context/FilteredHistoryContext";
+import {computeAggregates, useHistory} from "@/context/HistoryContext";
+import {FilteredHistoryProvider} from "@/context/FilteredHistoryContext";
 
-export default function HistoryLayout({ children }: { children: React.ReactNode }) {
+export default function HistoryLayout({children}: { children: React.ReactNode }) {
     const pathname = usePathname() || "";
     const base = "/history";
     const links = [
-        { label: "Overview", href: `${base}/overview` },
-        { label: "Artists", href: `${base}/artists` },
-        { label: "Skips", href: `${base}/skips` },
-        { label: "Timeline", href: `${base}/timeline` },
+        {label: "Overview", href: `${base}/overview`},
+        {label: "Artists", href: `${base}/artists`},
+        {label: "Skips", href: `${base}/skips`},
+        {label: "Timeline", href: `${base}/timeline`},
     ];
 
-    const { history } = useHistory();
-    const [dateRange, setDateRange] = useState<{ start: number | null; end: number | null }>({ start: null, end: null });
+    const {history} = useHistory();
+    const [dateRange, setDateRange] = useState<{ start: number | null; end: number | null }>({start: null, end: null});
 
     const filteredHistory = useMemo(() => {
         if (!dateRange.start || !dateRange.end) {
@@ -35,7 +35,7 @@ export default function HistoryLayout({ children }: { children: React.ReactNode 
     const filteredAggregates = useMemo(() => computeAggregates(filteredHistory), [filteredHistory]);
 
     const handleRangeChange = useCallback((start: number, end: number) => {
-        setDateRange({ start, end });
+        setDateRange({start, end});
     }, []);
 
     const providerValue = useMemo(() => ({
@@ -61,7 +61,7 @@ export default function HistoryLayout({ children }: { children: React.ReactNode 
                             key={link.href}
                             href={link.href}
                             className={styles.button}
-                            style={pathname === link.href ? { outline: "2px solid rgba(85,255,155,0.75)" } : undefined}
+                            style={pathname === link.href ? {outline: "2px solid rgba(85,255,155,0.75)"} : undefined}
                         >
                             {link.label}
                         </Link>
@@ -70,11 +70,11 @@ export default function HistoryLayout({ children }: { children: React.ReactNode 
 
                 <div className={styles.card}>
                     <div className={`${styles.cardBody} ${styles.timelineCardBody}`}>
-                        <Timeline history={history || []} onRangeChange={handleRangeChange} />
+                        <Timeline history={history || []} onRangeChange={handleRangeChange}/>
                     </div>
                 </div>
 
-                <div style={{ marginTop: "1rem" }}>{children}</div>
+                <div style={{marginTop: "1rem"}}>{children}</div>
 
                 <footer className={styles.footer}>
                     © 2026 obrockmole. All rights reserved.

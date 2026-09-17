@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Listen } from "@/types";
-import { useHistory } from "@/context/HistoryContext";
+import React, {useState} from "react";
+import {useRouter} from "next/navigation";
+import {Listen} from "@/types";
+import {useHistory} from "@/context/HistoryContext";
 
 export default function Home() {
     const [fileNames, setFileNames] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const router = useRouter();
-    const { setHistory } = useHistory();
+    const {setHistory} = useHistory();
 
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;

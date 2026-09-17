@@ -2,7 +2,8 @@
 
 import React, {useLayoutEffect, useRef} from "react";
 import * as am5 from "@amcharts/amcharts5";
-import { Listen } from "@/types";
+import {Color} from "@amcharts/amcharts5";
+import {Listen} from "@/types";
 import {
     AxisRenderer,
     AxisRendererX,
@@ -13,14 +14,13 @@ import {
     XYChart,
     XYCursor
 } from "@amcharts/amcharts5/xy";
-import {Color} from "@amcharts/amcharts5";
 
 interface ListensByPlatformProps {
     history?: Listen[];
     data?: { platform: string; value: number }[];
 }
 
-const ListensByPlatform: React.FC<ListensByPlatformProps> = ({ history, data }) => {
+const ListensByPlatform: React.FC<ListensByPlatformProps> = ({history, data}) => {
     const rootRef = useRef<am5.Root | null>(null);
     const seriesRef = useRef<ColumnSeries | null>(null);
     const yAxisRef = useRef<CategoryAxis<AxisRenderer> | null>(null)
@@ -160,7 +160,7 @@ const ListensByPlatform: React.FC<ListensByPlatformProps> = ({ history, data }) 
     }, [data, history]);
 
     return (
-        <div id="ListensByPlatformDiv" style={{ width: "100%", minHeight: 300, marginLeft: 8, marginBottom: 8 }}></div>
+        <div id="ListensByPlatformDiv" style={{width: "100%", minHeight: 300, marginLeft: 8, marginBottom: 8}}></div>
     );
 };
 

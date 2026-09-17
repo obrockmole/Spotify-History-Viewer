@@ -1,8 +1,8 @@
 "use client";
 
-import React, { ReactNode } from "react";
-import { AggregatedData, CountryData, PlatformData, SongData, Stats } from "@/context/HistoryContext";
-import { Listen } from "@/types";
+import React, {ReactNode} from "react";
+import {AggregatedData, CountryData, PlatformData, SongData, Stats} from "@/context/HistoryContext";
+import {Listen} from "@/types";
 
 type DateRange = { start: number | null; end: number | null };
 
@@ -20,7 +20,7 @@ interface FilteredHistoryContextType {
 
 const FilteredHistoryContext = React.createContext<FilteredHistoryContextType | undefined>(undefined);
 
-export function FilteredHistoryProvider({ children, value }: { children: ReactNode; value: FilteredHistoryContextType }) {
+export function FilteredHistoryProvider({children, value}: { children: ReactNode; value: FilteredHistoryContextType }) {
     return (
         <FilteredHistoryContext.Provider value={value}>
             {children}

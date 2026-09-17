@@ -2,22 +2,24 @@
 
 import React, {useLayoutEffect, useRef} from "react";
 import * as am5 from "@amcharts/amcharts5";
-import { Listen } from "@/types";
+import {Color} from "@amcharts/amcharts5";
+import {Listen} from "@/types";
 import {
     AxisRendererX,
     AxisRendererY,
     ColumnSeries,
     DateAxis,
     ValueAxis,
-    XYChart, XYCursor
+    XYChart,
+    XYCursor
 } from "@amcharts/amcharts5/xy";
-import {Color} from "@amcharts/amcharts5";
+
 interface ListensOverTimeProps {
     history?: Listen[];
     data?: { date: number; value: number }[];
 }
 
-const ListensOverTime: React.FC<ListensOverTimeProps> = ({ history, data }) => {
+const ListensOverTime: React.FC<ListensOverTimeProps> = ({history, data}) => {
     const rootRef = useRef<am5.Root | null>(null);
     const seriesRef = useRef<ColumnSeries | null>(null);
 
@@ -144,7 +146,7 @@ const ListensOverTime: React.FC<ListensOverTimeProps> = ({ history, data }) => {
     }, [data, history]);
 
     return (
-        <div id="ListensOverTimeDiv" style={{ minHeight: 450, marginLeft: 5, marginBottom: 8 }}></div>
+        <div id="ListensOverTimeDiv" style={{minHeight: 450, marginLeft: 5, marginBottom: 8}}></div>
     );
 };
 

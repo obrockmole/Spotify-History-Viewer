@@ -1,12 +1,27 @@
 "use client";
 
-import { createContext, useState, ReactNode, useContext } from "react";
-import { Listen } from "@/types";
+import {createContext, ReactNode, useContext, useState} from "react";
+import {Listen} from "@/types";
 
-export interface AggregatedData { date: number; value: number }
-export interface PlatformData { platform: string; value: number }
-export interface CountryData { id: string; value: number }
-export interface SongData { song: string; value: number }
+export interface AggregatedData {
+    date: number;
+    value: number
+}
+
+export interface PlatformData {
+    platform: string;
+    value: number
+}
+
+export interface CountryData {
+    id: string;
+    value: number
+}
+
+export interface SongData {
+    song: string;
+    value: number
+}
 
 export interface Stats {
     listens: number;
@@ -84,11 +99,26 @@ export function computeAggregates(history: Listen[]) {
         }
     }
 
-    const daily = Object.keys(dayMap).map(day => ({ date: parseInt(day), value: dayMap[parseInt(day)] })).sort((a, b ) => a.date - b.date);
-    const monthly = Object.keys(monthMap).map(month => ({ date: parseInt(month), value: monthMap[parseInt(month)] })).sort((a, b) => a.date - b.date);
-    const platforms = Object.keys(platformMap).map(platform => ({ platform: platform, value: platformMap[platform]})).sort((a, b) => b.value - a.value).slice(0, 10);
-    const countries = Object.keys(countryMap).map(country => ({ id: country, value: countryMap[country]})).sort((a, b) => b.value - a.value);
-    const songListens = Object.keys(songMap).map(song => ({ song: song, value: songMap[song]})).sort((a, b) => b.value - a.value).slice(0, 10);
+    const daily = Object.keys(dayMap).map(day => ({
+        date: parseInt(day),
+        value: dayMap[parseInt(day)]
+    })).sort((a, b) => a.date - b.date);
+    const monthly = Object.keys(monthMap).map(month => ({
+        date: parseInt(month),
+        value: monthMap[parseInt(month)]
+    })).sort((a, b) => a.date - b.date);
+    const platforms = Object.keys(platformMap).map(platform => ({
+        platform: platform,
+        value: platformMap[platform]
+    })).sort((a, b) => b.value - a.value).slice(0, 10);
+    const countries = Object.keys(countryMap).map(country => ({
+        id: country,
+        value: countryMap[country]
+    })).sort((a, b) => b.value - a.value);
+    const songListens = Object.keys(songMap).map(song => ({
+        song: song,
+        value: songMap[song]
+    })).sort((a, b) => b.value - a.value).slice(0, 10);
 
     const minutesListened = Math.round(totalSeconds / 60);
 
@@ -115,7 +145,7 @@ export function computeAggregates(history: Listen[]) {
         if (entries.length === 0) {
             return "";
         }
-        return entries.reduce((a,b)=> Number(b[1]) > Number(a[1]) ? b : a)[0];
+        return entries.reduce((a, b) => Number(b[1]) > Number(a[1]) ? b : a)[0];
     })();
 
     const mostActiveMonth = (() => {
@@ -139,10 +169,10 @@ export function computeAggregates(history: Listen[]) {
         mostActiveMonth: mostActiveMonth
     };
 
-    return { daily, monthly, platforms, countries, songListens, stats };
+    return {daily, monthly, platforms, countries, songListens, stats};
 }
 
-export function HistoryProvider({ children }: { children: ReactNode }) {
+export function HistoryProvider({children}: { children: ReactNode }) {
     const [history, _setHistory] = useState<Listen[]>([]);
     const [stats, setStats] = useState<Stats | undefined>(undefined);
     const [daily, setDaily] = useState<AggregatedData[] | undefined>(undefined);
@@ -166,7 +196,16 @@ export function HistoryProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <HistoryContext.Provider value={{ history, setHistory, dailyData: daily, monthlyData: monthly, platformData: platforms, countryData: countries, songData: songListens, stats }}>
+        <HistoryContext.Provider value={{
+            history,
+            setHistory,
+            dailyData: daily,
+            monthlyData: monthly,
+            platformData: platforms,
+            countryData: countries,
+            songData: songListens,
+            stats
+        }}>
             {children}
         </HistoryContext.Provider>
     );
