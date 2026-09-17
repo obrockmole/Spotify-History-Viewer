@@ -6,98 +6,98 @@ import { Listen } from "@/types";
 import { useHistory } from "@/context/HistoryContext";
 
 export default function Home() {
-  const [fileNames, setFileNames] = useState<string[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const router = useRouter();
-  const { setHistory } = useHistory();
+    const [fileNames, setFileNames] = useState<string[]>([]);
+    const [error, setError] = useState<string | null>(null);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const router = useRouter();
+    const { setHistory } = useHistory();
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) {
-      return;
-    }
+    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (!files || files.length === 0) {
+            return;
+        }
 
-    setFileNames(Array.from(files).map(f => f.name));
-    setError(null);
-    setIsProcessing(true);
+        setFileNames(Array.from(files).map(f => f.name));
+        setError(null);
+        setIsProcessing(true);
 
-    try {
-      const parsedArrays = await Promise.all(
-        Array.from(files).map(async (file) => {
-          const text = await file.text();
-          const data = JSON.parse(text);
+        try {
+            const parsedArrays = await Promise.all(
+                Array.from(files).map(async (file) => {
+                    const text = await file.text();
+                    const data = JSON.parse(text);
 
-          if (!Array.isArray(data)) {
-            throw new Error(`Invalid JSON in ${file.name}`);
-          }
+                    if (!Array.isArray(data)) {
+                        throw new Error(`Invalid JSON in ${file.name}`);
+                    }
 
-          return data as Listen[];
-        })
-      );
+                    return data as Listen[];
+                })
+            );
 
-      const allEntries = parsedArrays.flat();
-      setHistory(allEntries);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+            const allEntries = parsedArrays.flat();
+            setHistory(allEntries);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : String(err));
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center min-h-screen bg-zinc-50 font-sans dark:bg-black text-zinc-900 dark:text-zinc-50">
-      <main className="flex flex-col items-center justify-center flex-1 w-full max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl mb-8">
-          Spotify History Viewer
-        </h1>
+    return (
+        <div className="flex flex-col flex-1 items-center justify-center min-h-screen bg-zinc-50 font-sans dark:bg-black text-zinc-900 dark:text-zinc-50">
+            <main className="flex flex-col items-center justify-center flex-1 w-full max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+                <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl mb-8">
+                    Spotify History Viewer
+                </h1>
 
-        <div className="w-full max-w-sm">
-          <label
-            htmlFor="file-upload"
-            className="cursor-pointer inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-blue-700"
-          >
-            Select JSON File
-          </label>
+                <div className="w-full max-w-sm">
+                    <label
+                        htmlFor="file-upload"
+                        className="cursor-pointer inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-blue-700"
+                    >
+                        Select JSON File
+                    </label>
 
-          <input
-            id="file-upload"
-            name="file-upload"
-            type="file"
-            className="sr-only"
-            accept=".json"
-            onChange={handleFileUpload}
-            multiple
-          />
+                    <input
+                        id="file-upload"
+                        name="file-upload"
+                        type="file"
+                        className="sr-only"
+                        accept=".json"
+                        onChange={handleFileUpload}
+                        multiple
+                    />
+                </div>
+
+                {isProcessing && (
+                    <div className="mt-8 text-lg">
+                        <p>Loading...</p>
+                    </div>
+                )}
+
+                {fileNames.length > 0 && !isProcessing && (
+                    <div className="mt-8 text-lg">
+                        <p>
+                            Files: <span className="font-medium">{fileNames.join(", ")}</span>
+                        </p>
+
+                        <button
+                            onClick={() => router.push("/history/overview")}
+                            className="mt-4 cursor-pointer inline-flex items-center justify-center rounded-full bg-green-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-green-700"
+                        >
+                            View History
+                        </button>
+                    </div>
+                )}
+
+                {error && (
+                    <div className="mt-4 text-lg text-red-600 dark:text-red-400">
+                        <p>{error}</p>
+                    </div>
+                )}
+            </main>
         </div>
-
-        {isProcessing && (
-          <div className="mt-8 text-lg">
-            <p>Loading...</p>
-          </div>
-        )}
-
-        {fileNames.length > 0 && !isProcessing && (
-          <div className="mt-8 text-lg">
-            <p>
-              Files: <span className="font-medium">{fileNames.join(", ")}</span>
-            </p>
-
-            <button
-              onClick={() => router.push("/history")}
-              className="mt-4 cursor-pointer inline-flex items-center justify-center rounded-full bg-green-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-green-700"
-            >
-              View History
-            </button>
-          </div>
-        )}
-
-        {error && (
-          <div className="mt-4 text-lg text-red-600 dark:text-red-400">
-            <p>{error}</p>
-          </div>
-        )}
-      </main>
-    </div>
-  );
+    );
 }

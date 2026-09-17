@@ -14,23 +14,17 @@ import {
   XYCursor
 } from "@amcharts/amcharts5/xy";
 import {Color} from "@amcharts/amcharts5";
-import {useHistory} from "@/context/HistoryContext";
 
 interface TopSongListensProps {
-  history: Listen[];
+  history?: Listen[];
+  data?: { song: string; value: number }[];
 }
 
-interface AggregatedData {
-  song: string;
-  value: number;
-}
-
-const TopSongListens: React.FC<TopSongListensProps> = ({ history }) => {
+const TopSongListens: React.FC<TopSongListensProps> = ({ history, data }) => {
   const rootRef = useRef<am5.Root | null>(null);
   const seriesRef = useRef<ColumnSeries | null>(null);
   const yAxisRef = useRef<CategoryAxis<AxisRenderer> | null>(null)
   const xAxisRef = useRef<ValueAxis<AxisRenderer> | null>(null)
-  const { songData } = useHistory();
 
   useLayoutEffect(() => {
     const root = am5.Root.new("TopSongListensDiv");
@@ -81,7 +75,7 @@ const TopSongListens: React.FC<TopSongListensProps> = ({ history }) => {
       categoryYField: "song",
       fill: Color.fromHex(0x0ADB6C),
       tooltip: am5.Tooltip.new(root, {
-        labelText: "{valueX} listens"
+        labelText: "{categoryY}: {valueX} listens"
       })
     })
 
@@ -135,34 +129,35 @@ const TopSongListens: React.FC<TopSongListensProps> = ({ history }) => {
   }, [])
 
   useLayoutEffect(() => {
-    if (!seriesRef.current || !yAxisRef.current || history.length === 0) {
+    if (!seriesRef.current || !yAxisRef.current) {
       return;
     }
 
-    if (songData && songData.length > 0) {
-      yAxisRef.current.data.setAll(songData);
-      seriesRef.current.data.setAll(songData);
+    let chartData;
+    if (data && data.length > 0) {
+      chartData = data;
+    } else {
+      chartData = (history || []).reduce<{ song: string; value: number }[]>((result, item) => {
+        const song = (item.master_metadata_track_name || "Unknown").trim();
+
+        const index = result.findIndex((entry) => entry.song === song);
+        if (index >= 0) {
+          result[index].value += 1;
+        } else {
+          result.push({song, value: 1});
+        }
+
+        return result;
+      }, []).sort((a, b) => b.value - a.value).slice(0, 10);
+    }
+
+    if (chartData.length === 0) {
       return;
     }
 
-    const dataMap: { [key: string]: number } = {};
-
-    history.forEach(item => {
-      const song = (item.master_metadata_track_name || "Unknown").trim();
-      dataMap[song] = (dataMap[song] || 0) + 1;
-    });
-
-    const aggregatedData: AggregatedData[] = Object.keys(dataMap).map(song => ({
-      song,
-      value: dataMap[song]
-    }));
-
-    aggregatedData.sort((a, b) => b.value - a.value);
-    const filteredData = aggregatedData.slice(0, 10);
-
-    yAxisRef.current.data.setAll(filteredData);
-    seriesRef.current.data.setAll(filteredData);
-  }, [history, songData]);
+    yAxisRef.current.data.setAll(chartData);
+    seriesRef.current.data.setAll(chartData);
+  }, [data, history]);
 
   return (
     <div id="TopSongListensDiv" style={{ width: "100%", minHeight: 300, marginLeft: 8, marginBottom: 8 }}></div>

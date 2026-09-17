@@ -5,24 +5,23 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5map from "@amcharts/amcharts5/map"
 import am5geodata_worldLow from "@amcharts/amcharts5-geodata/worldLow"
 import { Listen } from "@/types";
-import {useHistory} from "@/context/HistoryContext";
 
 interface ListensByCountryProps {
-  history: Listen[];
+  history?: Listen[];
+  data?: { id: string; value: number }[];
 }
 
-const ListensByCountry: React.FC<ListensByCountryProps> = ({ history }) => {
+const ListensByCountry: React.FC<ListensByCountryProps> = ({ history, data }) => {
   const rootRef = useRef<am5.Root | null>(null)
   const seriesRef = useRef<am5map.MapPolygonSeries | null>(null)
-  const { countryData } = useHistory()
 
   useLayoutEffect(() => {
     const root = am5.Root.new("ListensByCountryDiv")
 
     const chart = root.container.children.push(
       am5map.MapChart.new(root, {
-        panX: "translateX",
-        panY: "translateY",
+        panX: "none",
+        panY: "none",
         projection: am5map.geoMercator(),
         paddingLeft: 0,
         paddingRight: 0,
@@ -67,33 +66,37 @@ const ListensByCountry: React.FC<ListensByCountryProps> = ({ history }) => {
   }, [])
 
   useLayoutEffect(() => {
-    if (!seriesRef.current || history.length === 0) {
+    if (!seriesRef.current) {
       return;
     }
 
-    if (countryData && countryData.length > 0) {
-      seriesRef.current.data.setAll(countryData);
-      return;
-    }
+    let chartData;
+    if (data && data.length > 0) {
+        chartData = data;
+    } else {
+        chartData = (history || []).reduce<{ id: string; value: number }[]>((result, item) => {
+          const country = item.conn_country?.toUpperCase().trim();
+          if (!country) {
+            return result;
+          }
 
-    const dataMap: { [key: string]: number } = {};
+          const index = result.findIndex((entry) => entry.id === country);
+          if (index >= 0) {
+            result[index].value += 1;
+          } else {
+            result.push({ id: country, value: 1 });
+          }
 
-    history.forEach(item => {
-      let country = item.conn_country
-
-      if (country) {
-        country = country.toUpperCase().trim()
-        dataMap[country] = (dataMap[country] || 0) + 1
+          return result;
+        }, []);
       }
-    })
 
-    const aggregatedData = Object.keys(dataMap).map(country => ({
-      id: country,
-      value: dataMap[country]
-    }));
+    if (chartData.length === 0) {
+      return;
+    }
 
-    seriesRef.current.data.setAll(aggregatedData);
-  }, [history, countryData]);
+    seriesRef.current.data.setAll(chartData);
+  }, [data, history]);
 
   return (
     <div id="ListensByCountryDiv" style={{ width: "100%", minHeight: 300, marginLeft: 8, marginBottom: 8 }}></div>
