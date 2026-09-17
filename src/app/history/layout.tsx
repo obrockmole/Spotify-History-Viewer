@@ -18,21 +18,36 @@ export default function HistoryLayout({children}: { children: React.ReactNode })
         {label: "Timeline", href: `${base}/timeline`},
     ];
 
-    const {history} = useHistory();
+    const {
+        history,
+        stats,
+        dailyData,
+        monthlyData,
+        platformData,
+        countryData,
+        songData
+    } = useHistory();
+
     const [dateRange, setDateRange] = useState<{ start: number | null; end: number | null }>({start: null, end: null});
 
+    const hasRangeChanged = dateRange.start !== null && dateRange.end !== null;
+
     const filteredHistory = useMemo(() => {
-        if (!dateRange.start || !dateRange.end) {
+        if (!hasRangeChanged) {
             return history || [];
         }
-
         return (history || []).filter((item) => {
-            const time = new Date(item.ts).getTime();
-            return time >= dateRange.start! && time <= dateRange.end!;
+            return item.timestamp! >= dateRange.start! && item.timestamp! <= dateRange.end!;
         });
-    }, [dateRange, history]);
+    }, [dateRange, history, hasRangeChanged]);
 
-    const filteredAggregates = useMemo(() => computeAggregates(filteredHistory), [filteredHistory]);
+    const filteredAggregates = useMemo(() => {
+        if (!hasRangeChanged) {
+            return null;
+        }
+
+        return computeAggregates(filteredHistory);
+    }, [filteredHistory, hasRangeChanged]);
 
     const handleRangeChange = useCallback((start: number, end: number) => {
         setDateRange({start, end});
@@ -42,13 +57,13 @@ export default function HistoryLayout({children}: { children: React.ReactNode })
         filteredHistory,
         dateRange,
         setRange: handleRangeChange,
-        stats: filteredAggregates.stats,
-        dailyData: filteredAggregates.daily,
-        monthlyData: filteredAggregates.monthly,
-        platformData: filteredAggregates.platforms,
-        countryData: filteredAggregates.countries,
-        songData: filteredAggregates.songListens,
-    }), [dateRange, filteredAggregates, filteredHistory, handleRangeChange]);
+        stats: hasRangeChanged && filteredAggregates ? filteredAggregates.stats : (stats as never),
+        dailyData: hasRangeChanged && filteredAggregates ? filteredAggregates.daily : (dailyData as never),
+        monthlyData: hasRangeChanged && filteredAggregates ? filteredAggregates.monthly : (monthlyData as never),
+        platformData: hasRangeChanged && filteredAggregates ? filteredAggregates.platforms : (platformData as never),
+        countryData: hasRangeChanged && filteredAggregates ? filteredAggregates.countries : (countryData as never),
+        songData: hasRangeChanged && filteredAggregates ? filteredAggregates.songListens : (songData as never)}
+    ), [filteredHistory, dateRange, handleRangeChange, hasRangeChanged, filteredAggregates, stats, dailyData, monthlyData, platformData, countryData, songData]);
 
     return (
         <FilteredHistoryProvider value={providerValue}>

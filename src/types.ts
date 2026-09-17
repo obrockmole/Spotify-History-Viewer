@@ -14,4 +14,8 @@ export interface Listen {
     offline: boolean;
     offline_timestamp: number;
     incognito_mode: boolean;
+
+    timestamp?: number;
+    dayKey?: number;
+    monthKey?: number;
 }

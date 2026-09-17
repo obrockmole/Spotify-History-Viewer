@@ -61,9 +61,9 @@ export function computeAggregates(history: Listen[]) {
 
     for (let i = 0; i < history.length; i++) {
         const entry = history[i];
-        const date = new Date(entry.ts);
-        const dayKey = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-        const monthKey = new Date(date.getFullYear(), date.getMonth(), 1).getTime();
+        const dayKey = entry.dayKey!;
+        const monthKey = entry.monthKey!;
+        const time = entry.timestamp!;
 
         dayMap[dayKey] = (dayMap[dayKey] || 0) + 1;
         monthMap[monthKey] = (monthMap[monthKey] || 0) + 1;
@@ -90,7 +90,6 @@ export function computeAggregates(history: Listen[]) {
             skipped++;
         }
 
-        const time = date.getTime();
         if (time < minTime) {
             minTime = time;
         }
@@ -181,8 +180,19 @@ export function HistoryProvider({children}: { children: ReactNode }) {
     const [countries, setCountries] = useState<CountryData[] | undefined>(undefined);
     const [songListens, setSongListens] = useState<SongData[] | undefined>(undefined);
 
-    const setHistory = (history: Listen[]) => {
+    const setHistory = (rawHistory: Listen[]) => {
+        const history = rawHistory.map(entry => {
+            const date = new Date(entry.ts);
+            return {
+                ...entry,
+                timestamp: date.getTime(),
+                dayKey: new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime(),
+                monthKey: new Date(date.getFullYear(), date.getMonth(), 1).getTime()
+            };
+        });
+
         _setHistory(history);
+
         setTimeout(() => {
             const aggregates = computeAggregates(history);
 
