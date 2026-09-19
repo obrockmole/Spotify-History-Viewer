@@ -24,7 +24,7 @@ const MinutesByYear: React.FC<MinutesByYearProps> = ({data}) => {
         const root = am5.Root.new("MinutesByYearDiv");
         const chart = root.container.children.push(
             XYChart.new(root, {
-                panX: true,
+                panX: false,
                 panY: false,
                 wheelX: "panX",
                 wheelY: "zoomX",
@@ -41,7 +41,19 @@ const MinutesByYear: React.FC<MinutesByYearProps> = ({data}) => {
             DateAxis.new(root, {
                 baseInterval: { timeUnit: "day", count: 1 },
                 renderer: AxisRendererX.new(root, {}),
-                tooltipDateFormat: "MMM dd"
+                tooltipDateFormat: "MMM dd",
+                dateFormats: {
+                    day: "MMM dd",
+                    week: "MMM dd",
+                    month: "MMM",
+                    year: "MMM"
+                },
+                periodChangeDateFormats: {
+                    day: "MMM dd",
+                    week: "MMM dd",
+                    month: "MMM",
+                    year: "MMM"
+                }
             })
         );
 

@@ -60,8 +60,10 @@ export function computeAggregates(history: Listen[]) {
     const countryMap: Record<string, number> = {};
     const artistSet = new Set<string>();
     const songMap: Record<string, number> = {};
+
     const yearlyMinutesMap: Record<number, AggregatedData[]> = {};
     const cumulativeMins: Record<string, number> = {};
+    const dailyMinsMap: Record<number, number> = {};
 
     let totalSeconds = 0;
     let skipped = 0;
@@ -72,11 +74,7 @@ export function computeAggregates(history: Listen[]) {
         const entry = history[i];
         const dayKey = entry.dayKey!;
         const monthKey = entry.monthKey!;
-        const yearKey = entry.yearKey!;
         const time = entry.timestamp!;
-
-        const dateObj = new Date(time);
-        const normalizedDate = new Date(yearKey, dateObj.getMonth(), dateObj.getDate(), dateObj.getHours(), dateObj.getMinutes()).getTime();
 
         dayMap[dayKey] = (dayMap[dayKey] || 0) + 1;
         monthMap[monthKey] = (monthMap[monthKey] || 0) + 1;
@@ -98,18 +96,10 @@ export function computeAggregates(history: Listen[]) {
             artistSet.add(entry.master_metadata_album_artist_name);
         }
 
+        const mins = Number(entry.ms_played) / 1000 / 60 || 0;
+        dailyMinsMap[dayKey] = (dailyMinsMap[dayKey] || 0) + mins;
+
         totalSeconds += Number(entry.ms_played) / 1000 || 0;
-
-        if (!yearlyMinutesMap[yearKey]) {
-            yearlyMinutesMap[yearKey] = [];
-            cumulativeMins[yearKey] = 0;
-        }
-
-        cumulativeMins[yearKey] += (Number(entry.ms_played) / 1000 / 60);
-        yearlyMinutesMap[yearKey].push({
-            date: normalizedDate,
-            value: cumulativeMins[yearKey]
-        });
 
         if (entry.skipped) {
             skipped++;
@@ -122,6 +112,32 @@ export function computeAggregates(history: Listen[]) {
             maxTime = time;
         }
     }
+
+    const sortedDays = Object.keys(dailyMinsMap).map(Number).sort((a, b) => a - b);
+
+    for (let i = 0; i < sortedDays.length; i++) {
+        const dayKey = sortedDays[i];
+        const dateObj = new Date(dayKey);
+        const actualYear = dateObj.getFullYear();
+
+        const normalizedDate = new Date(2024, dateObj.getMonth(), dateObj.getDate()).getTime();
+
+        if (!yearlyMinutesMap[actualYear]) {
+            yearlyMinutesMap[actualYear] = [];
+            cumulativeMins[actualYear] = 0;
+        }
+
+        cumulativeMins[actualYear] += dailyMinsMap[dayKey];
+        yearlyMinutesMap[actualYear].push({
+            date: normalizedDate,
+            value: cumulativeMins[actualYear]
+        });
+    }
+
+    const yearlyMinutes = Object.keys(yearlyMinutesMap).map(year => ({
+        year,
+        data: yearlyMinutesMap[parseInt(year)]
+    }));
 
     const daily = Object.keys(dayMap).map(day => ({
         date: parseInt(day),
@@ -143,10 +159,6 @@ export function computeAggregates(history: Listen[]) {
         song: song,
         value: songMap[song]
     })).sort((a, b) => b.value - a.value).slice(0, 10);
-    const yearlyMinutes = Object.keys(yearlyMinutesMap).map(year => ({
-        year,
-        data: yearlyMinutesMap[parseInt(year)]
-    }));
 
     const minutesListened = Math.round(totalSeconds / 60);
 
