@@ -3,10 +3,10 @@
 import React from "react";
 import {useFilteredHistory} from "@/context/FilteredHistoryContext";
 import styles from "../history.module.css";
-import ListensOverTime from "@/components/ListensOverTime";
-import ListensByPlatform from "@/components/ListensByPlatform";
-import ListensByCountry from "@/components/ListensByCountry";
-import TopSongListens from "@/components/TopSongListens";
+import ListensOverTime from "@/components/overview/ListensOverTime";
+import ListensByPlatform from "@/components/overview/ListensByPlatform";
+import ListensByCountry from "@/components/overview/ListensByCountry";
+import TopSongListens from "@/components/overview/TopSongListens";
 
 export default function OverviewPage() {
     const {stats, monthlyData, platformData, countryData, songData} = useFilteredHistory();

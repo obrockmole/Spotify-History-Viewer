@@ -25,7 +25,8 @@ export default function HistoryLayout({children}: { children: React.ReactNode })
         monthlyData,
         platformData,
         countryData,
-        songData
+        songData,
+        yearlyMinutesData
     } = useHistory();
 
     const [dateRange, setDateRange] = useState<{ start: number | null; end: number | null }>({start: null, end: null});
@@ -62,8 +63,9 @@ export default function HistoryLayout({children}: { children: React.ReactNode })
         monthlyData: hasRangeChanged && filteredAggregates ? filteredAggregates.monthly : (monthlyData as never),
         platformData: hasRangeChanged && filteredAggregates ? filteredAggregates.platforms : (platformData as never),
         countryData: hasRangeChanged && filteredAggregates ? filteredAggregates.countries : (countryData as never),
-        songData: hasRangeChanged && filteredAggregates ? filteredAggregates.songListens : (songData as never)}
-    ), [filteredHistory, dateRange, handleRangeChange, hasRangeChanged, filteredAggregates, stats, dailyData, monthlyData, platformData, countryData, songData]);
+        songData: hasRangeChanged && filteredAggregates ? filteredAggregates.songListens : (songData as never),
+        yearlyMinutesData: hasRangeChanged && filteredAggregates ? filteredAggregates.yearlyMinutes : (yearlyMinutesData as never)}
+    ), [filteredHistory, dateRange, handleRangeChange, hasRangeChanged, filteredAggregates, stats, dailyData, monthlyData, platformData, countryData, songData, yearlyMinutesData]);
 
     return (
         <FilteredHistoryProvider value={providerValue}>

@@ -23,6 +23,11 @@ export interface SongData {
     value: number
 }
 
+export interface YearlyMinutesData {
+    year: string;
+    data: AggregatedData[];
+}
+
 export interface Stats {
     listens: number;
     uniqueSongs: number;
@@ -35,14 +40,15 @@ export interface Stats {
 }
 
 interface HistoryContextType {
-    history: Listen[];
     setHistory: (history: Listen[]) => void;
+    history: Listen[];
+    stats?: Stats;
     dailyData?: AggregatedData[];
     monthlyData?: AggregatedData[];
     platformData?: PlatformData[];
     countryData?: CountryData[];
     songData?: SongData[];
-    stats?: Stats;
+    yearlyMinutesData?: YearlyMinutesData[];
 }
 
 const HistoryContext = createContext<HistoryContextType | undefined>(undefined);
@@ -54,6 +60,9 @@ export function computeAggregates(history: Listen[]) {
     const countryMap: Record<string, number> = {};
     const artistSet = new Set<string>();
     const songMap: Record<string, number> = {};
+    const yearlyMinutesMap: Record<number, AggregatedData[]> = {};
+    const cumulativeMins: Record<string, number> = {};
+
     let totalSeconds = 0;
     let skipped = 0;
     let minTime = Infinity;
@@ -63,7 +72,11 @@ export function computeAggregates(history: Listen[]) {
         const entry = history[i];
         const dayKey = entry.dayKey!;
         const monthKey = entry.monthKey!;
+        const yearKey = entry.yearKey!;
         const time = entry.timestamp!;
+
+        const dateObj = new Date(time);
+        const normalizedDate = new Date(yearKey, dateObj.getMonth(), dateObj.getDate(), dateObj.getHours(), dateObj.getMinutes()).getTime();
 
         dayMap[dayKey] = (dayMap[dayKey] || 0) + 1;
         monthMap[monthKey] = (monthMap[monthKey] || 0) + 1;
@@ -86,6 +99,18 @@ export function computeAggregates(history: Listen[]) {
         }
 
         totalSeconds += Number(entry.ms_played) / 1000 || 0;
+
+        if (!yearlyMinutesMap[yearKey]) {
+            yearlyMinutesMap[yearKey] = [];
+            cumulativeMins[yearKey] = 0;
+        }
+
+        cumulativeMins[yearKey] += (Number(entry.ms_played) / 1000 / 60);
+        yearlyMinutesMap[yearKey].push({
+            date: normalizedDate,
+            value: cumulativeMins[yearKey]
+        });
+
         if (entry.skipped) {
             skipped++;
         }
@@ -118,6 +143,10 @@ export function computeAggregates(history: Listen[]) {
         song: song,
         value: songMap[song]
     })).sort((a, b) => b.value - a.value).slice(0, 10);
+    const yearlyMinutes = Object.keys(yearlyMinutesMap).map(year => ({
+        year,
+        data: yearlyMinutesMap[parseInt(year)]
+    }));
 
     const minutesListened = Math.round(totalSeconds / 60);
 
@@ -168,7 +197,7 @@ export function computeAggregates(history: Listen[]) {
         mostActiveMonth: mostActiveMonth
     };
 
-    return {daily, monthly, platforms, countries, songListens, stats};
+    return {daily, monthly, platforms, countries, songListens, stats, yearlyMinutes};
 }
 
 export function HistoryProvider({children}: { children: ReactNode }) {
@@ -179,6 +208,7 @@ export function HistoryProvider({children}: { children: ReactNode }) {
     const [platforms, setPlatforms] = useState<PlatformData[] | undefined>(undefined);
     const [countries, setCountries] = useState<CountryData[] | undefined>(undefined);
     const [songListens, setSongListens] = useState<SongData[] | undefined>(undefined);
+    const [yearlyMinutes, setYearlyMinutes] = useState<YearlyMinutesData[] | undefined>(undefined);
 
     const setHistory = (rawHistory: Listen[]) => {
         const history = rawHistory.map(entry => {
@@ -187,7 +217,8 @@ export function HistoryProvider({children}: { children: ReactNode }) {
                 ...entry,
                 timestamp: date.getTime(),
                 dayKey: new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime(),
-                monthKey: new Date(date.getFullYear(), date.getMonth(), 1).getTime()
+                monthKey: new Date(date.getFullYear(), date.getMonth(), 1).getTime(),
+                yearKey: date.getFullYear(),
             };
         });
 
@@ -202,6 +233,7 @@ export function HistoryProvider({children}: { children: ReactNode }) {
             setPlatforms(aggregates.platforms);
             setCountries(aggregates.countries);
             setSongListens(aggregates.songListens)
+            setYearlyMinutes(aggregates.yearlyMinutes)
         }, 0);
     };
 
@@ -214,6 +246,7 @@ export function HistoryProvider({children}: { children: ReactNode }) {
             platformData: platforms,
             countryData: countries,
             songData: songListens,
+            yearlyMinutesData: yearlyMinutes,
             stats
         }}>
             {children}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, {ReactNode} from "react";
-import {AggregatedData, CountryData, PlatformData, SongData, Stats} from "@/context/HistoryContext";
+import {AggregatedData, CountryData, PlatformData, SongData, Stats, YearlyMinutesData} from "@/context/HistoryContext";
 import {Listen} from "@/types";
 
 type DateRange = { start: number | null; end: number | null };
@@ -15,6 +15,7 @@ interface FilteredHistoryContextType {
     platformData: PlatformData[];
     countryData: CountryData[];
     songData: SongData[];
+    yearlyMinutesData: YearlyMinutesData[];
     setRange: (start: number, end: number) => void;
 }
 

@@ -18,4 +18,5 @@ export interface Listen {
     timestamp?: number;
     dayKey?: number;
     monthKey?: number;
+    yearKey?: number;
 }
